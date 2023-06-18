@@ -26,10 +26,10 @@
  */
 
 namespace SellingPartnerApi\Model\CatalogItemsV20220401;
-
-use \ArrayAccess;
-use \SellingPartnerApi\ObjectSerializer;
-use \SellingPartnerApi\Model\ModelInterface;
+use ArrayAccess;
+use SellingPartnerApi\Model\BaseModel;
+use SellingPartnerApi\Model\ModelInterface;
+use SellingPartnerApi\ObjectSerializer;
 
 /**
  * ItemSummaryByMarketplace Class Doc Comment
@@ -42,7 +42,7 @@ use \SellingPartnerApi\Model\ModelInterface;
  * @template TKey int|null
  * @template TValue mixed|null  
  */
-class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSerializable
+class ItemSummaryByMarketplace extends BaseModel implements ModelInterface, ArrayAccess, \JsonSerializable, \IteratorAggregate
 {
     public const DISCRIMINATOR = null;
 
@@ -60,18 +60,25 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
       */
     protected static $openAPITypes = [
         'marketplace_id' => 'string',
+        'adult_product' => 'bool',
+        'autographed' => 'bool',
         'brand' => 'string',
         'browse_classification' => '\SellingPartnerApi\Model\CatalogItemsV20220401\ItemBrowseClassification',
         'color' => 'string',
+        'contributors' => '\SellingPartnerApi\Model\CatalogItemsV20220401\ItemContributor[]',
         'item_classification' => 'string',
         'item_name' => 'string',
         'manufacturer' => 'string',
+        'memorabilia' => 'bool',
         'model_number' => 'string',
         'package_quantity' => 'int',
         'part_number' => 'string',
+        'release_date' => 'string',
         'size' => 'string',
         'style' => 'string',
-        'website_display_group' => 'string'
+        'trade_in_eligible' => 'bool',
+        'website_display_group' => 'string',
+        'website_display_group_name' => 'string'
     ];
 
     /**
@@ -83,39 +90,28 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
       */
     protected static $openAPIFormats = [
         'marketplace_id' => null,
+        'adult_product' => null,
+        'autographed' => null,
         'brand' => null,
         'browse_classification' => null,
         'color' => null,
+        'contributors' => null,
         'item_classification' => null,
         'item_name' => null,
         'manufacturer' => null,
+        'memorabilia' => null,
         'model_number' => null,
         'package_quantity' => null,
         'part_number' => null,
+        'release_date' => null,
         'size' => null,
         'style' => null,
-        'website_display_group' => null
+        'trade_in_eligible' => null,
+        'website_display_group' => null,
+        'website_display_group_name' => null
     ];
 
-    /**
-     * Array of property to type mappings. Used for (de)serialization
-     *
-     * @return array
-     */
-    public static function openAPITypes()
-    {
-        return self::$openAPITypes;
-    }
 
-    /**
-     * Array of property to format mappings. Used for (de)serialization
-     *
-     * @return array
-     */
-    public static function openAPIFormats()
-    {
-        return self::$openAPIFormats;
-    }
 
     /**
      * Array of attributes where the key is the local name,
@@ -125,18 +121,25 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
      */
     protected static $attributeMap = [
         'marketplace_id' => 'marketplaceId',
+        'adult_product' => 'adultProduct',
+        'autographed' => 'autographed',
         'brand' => 'brand',
         'browse_classification' => 'browseClassification',
         'color' => 'color',
+        'contributors' => 'contributors',
         'item_classification' => 'itemClassification',
         'item_name' => 'itemName',
         'manufacturer' => 'manufacturer',
+        'memorabilia' => 'memorabilia',
         'model_number' => 'modelNumber',
         'package_quantity' => 'packageQuantity',
         'part_number' => 'partNumber',
+        'release_date' => 'releaseDate',
         'size' => 'size',
         'style' => 'style',
-        'website_display_group' => 'websiteDisplayGroup'
+        'trade_in_eligible' => 'tradeInEligible',
+        'website_display_group' => 'websiteDisplayGroup',
+        'website_display_group_name' => 'websiteDisplayGroupName'
     ];
 
     /**
@@ -145,19 +148,26 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
      * @var string[]
      */
     protected static $setters = [
-                'marketplace_id' => 'setMarketplaceId',
+        'marketplace_id' => 'setMarketplaceId',
+        'adult_product' => 'setAdultProduct',
+        'autographed' => 'setAutographed',
         'brand' => 'setBrand',
         'browse_classification' => 'setBrowseClassification',
         'color' => 'setColor',
+        'contributors' => 'setContributors',
         'item_classification' => 'setItemClassification',
         'item_name' => 'setItemName',
         'manufacturer' => 'setManufacturer',
+        'memorabilia' => 'setMemorabilia',
         'model_number' => 'setModelNumber',
         'package_quantity' => 'setPackageQuantity',
         'part_number' => 'setPartNumber',
+        'release_date' => 'setReleaseDate',
         'size' => 'setSize',
         'style' => 'setStyle',
-        'website_display_group' => 'setWebsiteDisplayGroup'
+        'trade_in_eligible' => 'setTradeInEligible',
+        'website_display_group' => 'setWebsiteDisplayGroup',
+        'website_display_group_name' => 'setWebsiteDisplayGroupName'
     ];
 
     /**
@@ -167,60 +177,28 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
      */
     protected static $getters = [
         'marketplace_id' => 'getMarketplaceId',
+        'adult_product' => 'getAdultProduct',
+        'autographed' => 'getAutographed',
         'brand' => 'getBrand',
         'browse_classification' => 'getBrowseClassification',
         'color' => 'getColor',
+        'contributors' => 'getContributors',
         'item_classification' => 'getItemClassification',
         'item_name' => 'getItemName',
         'manufacturer' => 'getManufacturer',
+        'memorabilia' => 'getMemorabilia',
         'model_number' => 'getModelNumber',
         'package_quantity' => 'getPackageQuantity',
         'part_number' => 'getPartNumber',
+        'release_date' => 'getReleaseDate',
         'size' => 'getSize',
         'style' => 'getStyle',
-        'website_display_group' => 'getWebsiteDisplayGroup'
+        'trade_in_eligible' => 'getTradeInEligible',
+        'website_display_group' => 'getWebsiteDisplayGroup',
+        'website_display_group_name' => 'getWebsiteDisplayGroupName'
     ];
 
-    /**
-     * Array of attributes where the key is the local name,
-     * and the value is the original name
-     *
-     * @return array
-     */
-    public static function attributeMap()
-    {
-        return self::$attributeMap;
-    }
 
-    /**
-     * Array of attributes to setter functions (for deserialization of responses)
-     *
-     * @return array
-     */
-    public static function setters()
-    {
-        return self::$setters;
-    }
-
-    /**
-     * Array of attributes to getter functions (for serialization of requests)
-     *
-     * @return array
-     */
-    public static function getters()
-    {
-        return self::$getters;
-    }
-
-    /**
-     * The original name of the model.
-     *
-     * @return string
-     */
-    public function getModelName()
-    {
-        return self::$openAPIModelName;
-    }
 
     const ITEM_CLASSIFICATION_BASE_PRODUCT = 'BASE_PRODUCT';
     const ITEM_CLASSIFICATION_OTHER = 'OTHER';
@@ -236,12 +214,16 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
      */
     public function getItemClassificationAllowableValues()
     {
-        return [
+        $baseVals = [
             self::ITEM_CLASSIFICATION_BASE_PRODUCT,
             self::ITEM_CLASSIFICATION_OTHER,
             self::ITEM_CLASSIFICATION_PRODUCT_BUNDLE,
             self::ITEM_CLASSIFICATION_VARIATION_PARENT,
         ];
+
+        // This is necessary because Amazon does not consistently capitalize their
+        // enum values, so we do case-insensitive enum value validation in ObjectSerializer
+        return array_map(function ($val) { return strtoupper($val); }, $baseVals);
     }
     
     /**
@@ -260,18 +242,25 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
     public function __construct(array $data = null)
     {
         $this->container['marketplace_id'] = $data['marketplace_id'] ?? null;
+        $this->container['adult_product'] = $data['adult_product'] ?? null;
+        $this->container['autographed'] = $data['autographed'] ?? null;
         $this->container['brand'] = $data['brand'] ?? null;
         $this->container['browse_classification'] = $data['browse_classification'] ?? null;
         $this->container['color'] = $data['color'] ?? null;
+        $this->container['contributors'] = $data['contributors'] ?? null;
         $this->container['item_classification'] = $data['item_classification'] ?? null;
         $this->container['item_name'] = $data['item_name'] ?? null;
         $this->container['manufacturer'] = $data['manufacturer'] ?? null;
+        $this->container['memorabilia'] = $data['memorabilia'] ?? null;
         $this->container['model_number'] = $data['model_number'] ?? null;
         $this->container['package_quantity'] = $data['package_quantity'] ?? null;
         $this->container['part_number'] = $data['part_number'] ?? null;
+        $this->container['release_date'] = $data['release_date'] ?? null;
         $this->container['size'] = $data['size'] ?? null;
         $this->container['style'] = $data['style'] ?? null;
+        $this->container['trade_in_eligible'] = $data['trade_in_eligible'] ?? null;
         $this->container['website_display_group'] = $data['website_display_group'] ?? null;
+        $this->container['website_display_group_name'] = $data['website_display_group_name'] ?? null;
     }
 
     /**
@@ -282,12 +271,14 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
     public function listInvalidProperties()
     {
         $invalidProperties = [];
-
         if ($this->container['marketplace_id'] === null) {
             $invalidProperties[] = "'marketplace_id' can't be null";
         }
         $allowedValues = $this->getItemClassificationAllowableValues();
-        if (!is_null($this->container['item_classification']) && !in_array($this->container['item_classification'], $allowedValues, true)) {
+        if (
+            !is_null($this->container['item_classification']) &&
+            !in_array(strtoupper($this->container['item_classification']), $allowedValues, true)
+        ) {
             $invalidProperties[] = sprintf(
                 "invalid value '%s' for 'item_classification', must be one of '%s'",
                 $this->container['item_classification'],
@@ -296,17 +287,6 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
         }
 
         return $invalidProperties;
-    }
-
-    /**
-     * Validate all the properties in the model
-     * return true if all passed
-     *
-     * @return bool True if all properties are valid
-     */
-    public function valid()
-    {
-        return count($this->listInvalidProperties()) === 0;
     }
 
 
@@ -330,6 +310,52 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
     public function setMarketplaceId($marketplace_id)
     {
         $this->container['marketplace_id'] = $marketplace_id;
+
+        return $this;
+    }
+    /**
+     * Gets adult_product
+     *
+     * @return bool|null
+     */
+    public function getAdultProduct()
+    {
+        return $this->container['adult_product'];
+    }
+
+    /**
+     * Sets adult_product
+     *
+     * @param bool|null $adult_product Identifies an Amazon catalog item is intended for an adult audience or is sexual in nature.
+     *
+     * @return self
+     */
+    public function setAdultProduct($adult_product)
+    {
+        $this->container['adult_product'] = $adult_product;
+
+        return $this;
+    }
+    /**
+     * Gets autographed
+     *
+     * @return bool|null
+     */
+    public function getAutographed()
+    {
+        return $this->container['autographed'];
+    }
+
+    /**
+     * Sets autographed
+     *
+     * @param bool|null $autographed Identifies an Amazon catalog item is autographed by a player or celebrity.
+     *
+     * @return self
+     */
+    public function setAutographed($autographed)
+    {
+        $this->container['autographed'] = $autographed;
 
         return $this;
     }
@@ -403,6 +429,29 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
         return $this;
     }
     /**
+     * Gets contributors
+     *
+     * @return \SellingPartnerApi\Model\CatalogItemsV20220401\ItemContributor[]|null
+     */
+    public function getContributors()
+    {
+        return $this->container['contributors'];
+    }
+
+    /**
+     * Sets contributors
+     *
+     * @param \SellingPartnerApi\Model\CatalogItemsV20220401\ItemContributor[]|null $contributors Individual contributors to the creation of an item, such as the authors or actors.
+     *
+     * @return self
+     */
+    public function setContributors($contributors)
+    {
+        $this->container['contributors'] = $contributors;
+
+        return $this;
+    }
+    /**
      * Gets item_classification
      *
      * @return string|null
@@ -422,7 +471,7 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
     public function setItemClassification($item_classification)
     {
         $allowedValues = $this->getItemClassificationAllowableValues();
-        if (!is_null($item_classification) && !in_array($item_classification, $allowedValues, true)) {
+        if (!is_null($item_classification) &&!in_array(strtoupper($item_classification), $allowedValues, true)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     "Invalid value '%s' for 'item_classification', must be one of '%s'",
@@ -478,6 +527,29 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
     public function setManufacturer($manufacturer)
     {
         $this->container['manufacturer'] = $manufacturer;
+
+        return $this;
+    }
+    /**
+     * Gets memorabilia
+     *
+     * @return bool|null
+     */
+    public function getMemorabilia()
+    {
+        return $this->container['memorabilia'];
+    }
+
+    /**
+     * Sets memorabilia
+     *
+     * @param bool|null $memorabilia Identifies an Amazon catalog item is memorabilia valued for its connection with historical events, culture, or entertainment.
+     *
+     * @return self
+     */
+    public function setMemorabilia($memorabilia)
+    {
+        $this->container['memorabilia'] = $memorabilia;
 
         return $this;
     }
@@ -551,6 +623,29 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
         return $this;
     }
     /**
+     * Gets release_date
+     *
+     * @return string|null
+     */
+    public function getReleaseDate()
+    {
+        return $this->container['release_date'];
+    }
+
+    /**
+     * Sets release_date
+     *
+     * @param string|null $release_date First date on which an Amazon catalog item is shippable to customers.
+     *
+     * @return self
+     */
+    public function setReleaseDate($release_date)
+    {
+        $this->container['release_date'] = $release_date;
+
+        return $this;
+    }
+    /**
      * Gets size
      *
      * @return string|null
@@ -597,6 +692,29 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
         return $this;
     }
     /**
+     * Gets trade_in_eligible
+     *
+     * @return bool|null
+     */
+    public function getTradeInEligible()
+    {
+        return $this->container['trade_in_eligible'];
+    }
+
+    /**
+     * Sets trade_in_eligible
+     *
+     * @param bool|null $trade_in_eligible Identifies an Amazon catalog item is eligible for trade-in.
+     *
+     * @return self
+     */
+    public function setTradeInEligible($trade_in_eligible)
+    {
+        $this->container['trade_in_eligible'] = $trade_in_eligible;
+
+        return $this;
+    }
+    /**
      * Gets website_display_group
      *
      * @return string|null
@@ -609,7 +727,7 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets website_display_group
      *
-     * @param string|null $website_display_group Name of the website display group associated with an Amazon catalog item.
+     * @param string|null $website_display_group Identifier of the website display group associated with an Amazon catalog item.
      *
      * @return self
      */
@@ -619,98 +737,28 @@ class ItemSummaryByMarketplace implements ModelInterface, ArrayAccess, \JsonSeri
 
         return $this;
     }
-
     /**
-     * Returns true if offset exists. False otherwise.
+     * Gets website_display_group_name
      *
-     * @param integer $offset Offset
-     *
-     * @return boolean
+     * @return string|null
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function getWebsiteDisplayGroupName()
     {
-        return isset($this->container[$offset]);
+        return $this->container['website_display_group_name'];
     }
 
     /**
-     * Gets offset.
+     * Sets website_display_group_name
      *
-     * @param integer $offset Offset
+     * @param string|null $website_display_group_name Display name of the website display group associated with an Amazon catalog item.
      *
-     * @return mixed|null
+     * @return self
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function setWebsiteDisplayGroupName($website_display_group_name)
     {
-        return $this->container[$offset] ?? null;
-    }
+        $this->container['website_display_group_name'] = $website_display_group_name;
 
-    /**
-     * Sets value based on offset.
-     *
-     * @param int|null $offset Offset
-     * @param mixed    $value  Value to be set
-     *
-     * @return void
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
-    {
-        if (is_null($offset)) {
-            $this->container[] = $value;
-        } else {
-            $this->container[$offset] = $value;
-        }
-    }
-
-    /**
-     * Unsets offset.
-     *
-     * @param integer $offset Offset
-     *
-     * @return void
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
-    {
-        unset($this->container[$offset]);
-    }
-
-    /**
-     * Serializes the object to a value that can be serialized natively by json_encode().
-     * @link https://www.php.net/manual/en/jsonserializable.jsonserialize.php
-     *
-     * @return mixed Returns data which can be serialized by json_encode(), which is a value
-     * of any type other than a resource.
-     */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
-       return ObjectSerializer::sanitizeForSerialization($this);
-    }
-
-    /**
-     * Gets the string presentation of the object
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return json_encode(
-            ObjectSerializer::sanitizeForSerialization($this),
-            JSON_PRETTY_PRINT
-        );
-    }
-
-    /**
-     * Gets a header-safe presentation of the object
-     *
-     * @return string
-     */
-    public function toHeaderValue()
-    {
-        return json_encode(ObjectSerializer::sanitizeForSerialization($this));
+        return $this;
     }
 }
 

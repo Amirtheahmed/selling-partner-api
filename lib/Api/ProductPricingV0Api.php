@@ -26,15 +26,10 @@
 
 namespace SellingPartnerApi\Api;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\RequestOptions;
 use SellingPartnerApi\ApiException;
-use SellingPartnerApi\Configuration;
-use SellingPartnerApi\HeaderSelector;
 use SellingPartnerApi\ObjectSerializer;
 
 /**
@@ -43,74 +38,8 @@ use SellingPartnerApi\ObjectSerializer;
  * @category Class
  * @package  SellingPartnerApi
  */
-class ProductPricingV0Api
+class ProductPricingV0Api extends BaseApi
 {
-    /**
-     * @var ClientInterface
-     */
-    protected $client;
-
-    /**
-     * @var Configuration
-     */
-    protected $config;
-
-    /**
-     * @var HeaderSelector
-     */
-    protected $headerSelector;
-
-    /**
-     * @var int Host index
-     */
-    protected $hostIndex;
-
-    /**
-     * @param Configuration   $config
-     * @param ClientInterface $client
-     * @param HeaderSelector  $selector
-     * @param int             $hostIndex (Optional) host index to select the list of hosts if defined in the OpenAPI spec
-     */
-    public function __construct(
-        Configuration $config,
-        ClientInterface $client = null,
-        HeaderSelector $selector = null,
-        $hostIndex = 0
-    ) {
-        $this->client = $client ?: new Client();
-        $this->config = $config;
-        $this->headerSelector = $selector ?: new HeaderSelector($this->config);
-        $this->hostIndex = $hostIndex;
-    }
-
-    /**
-     * Set the host index
-     *
-     * @param int $hostIndex Host index (required)
-     */
-    public function setHostIndex($hostIndex)
-    {
-        $this->hostIndex = $hostIndex;
-    }
-
-    /**
-     * Get the host index
-     *
-     * @return int Host index
-     */
-    public function getHostIndex()
-    {
-        return $this->hostIndex;
-    }
-
-    /**
-     * @return Configuration
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
     /**
      * Operation getCompetitivePricing
      *
@@ -1360,7 +1289,7 @@ class ProductPricingV0Api
      *
      * @param  string $marketplace_id A marketplace identifier. Specifies the marketplace for which prices are returned. (required)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (required)
-     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller&#39;s SellerId, which is included with every operation that you submit. (required)
+     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller's SellerId, which is included with every operation that you submit. (required)
      * @param  string $customer_type Indicates whether to request Consumer or Business offers. Default is Consumer. (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
@@ -1378,7 +1307,7 @@ class ProductPricingV0Api
      *
      * @param  string $marketplace_id A marketplace identifier. Specifies the marketplace for which prices are returned. (required)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (required)
-     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller&#39;s SellerId, which is included with every operation that you submit. (required)
+     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller's SellerId, which is included with every operation that you submit. (required)
      * @param  string $customer_type Indicates whether to request Consumer or Business offers. Default is Consumer. (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
@@ -1586,7 +1515,7 @@ class ProductPricingV0Api
      *
      * @param  string $marketplace_id A marketplace identifier. Specifies the marketplace for which prices are returned. (required)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (required)
-     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller&#39;s SellerId, which is included with every operation that you submit. (required)
+     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller's SellerId, which is included with every operation that you submit. (required)
      * @param  string $customer_type Indicates whether to request Consumer or Business offers. Default is Consumer. (optional)
      *
      * @throws \InvalidArgumentException
@@ -1604,7 +1533,7 @@ class ProductPricingV0Api
      *
      * @param  string $marketplace_id A marketplace identifier. Specifies the marketplace for which prices are returned. (required)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (required)
-     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller&#39;s SellerId, which is included with every operation that you submit. (required)
+     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller's SellerId, which is included with every operation that you submit. (required)
      * @param  string $customer_type Indicates whether to request Consumer or Business offers. Default is Consumer. (optional)
      *
      * @throws \InvalidArgumentException
@@ -1660,7 +1589,7 @@ class ProductPricingV0Api
      *
      * @param  string $marketplace_id A marketplace identifier. Specifies the marketplace for which prices are returned. (required)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (required)
-     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller&#39;s SellerId, which is included with every operation that you submit. (required)
+     * @param  string $seller_sku Identifies an item in the given marketplace. SellerSKU is qualified by the seller's SellerId, which is included with every operation that you submit. (required)
      * @param  string $customer_type Indicates whether to request Consumer or Business offers. Default is Consumer. (optional)
      *
      * @throws \InvalidArgumentException
@@ -2165,7 +2094,7 @@ class ProductPricingV0Api
      * @param  string[] $asins A list of up to twenty Amazon Standard Identification Number (ASIN) values used to identify items in the given marketplace. (optional)
      * @param  string[] $skus A list of up to twenty seller SKU values used to identify items in the given marketplace. (optional)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (optional)
-     * @param  string $offer_type Indicates whether to request pricing information for the seller&#39;s B2C or B2B offers. Default is B2C. (optional)
+     * @param  string $offer_type Indicates whether to request pricing information for the seller's B2C or B2B offers. Default is B2C. (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -2185,7 +2114,7 @@ class ProductPricingV0Api
      * @param  string[] $asins A list of up to twenty Amazon Standard Identification Number (ASIN) values used to identify items in the given marketplace. (optional)
      * @param  string[] $skus A list of up to twenty seller SKU values used to identify items in the given marketplace. (optional)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (optional)
-     * @param  string $offer_type Indicates whether to request pricing information for the seller&#39;s B2C or B2B offers. Default is B2C. (optional)
+     * @param  string $offer_type Indicates whether to request pricing information for the seller's B2C or B2B offers. Default is B2C. (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -2395,7 +2324,7 @@ class ProductPricingV0Api
      * @param  string[] $asins A list of up to twenty Amazon Standard Identification Number (ASIN) values used to identify items in the given marketplace. (optional)
      * @param  string[] $skus A list of up to twenty seller SKU values used to identify items in the given marketplace. (optional)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (optional)
-     * @param  string $offer_type Indicates whether to request pricing information for the seller&#39;s B2C or B2B offers. Default is B2C. (optional)
+     * @param  string $offer_type Indicates whether to request pricing information for the seller's B2C or B2B offers. Default is B2C. (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -2415,7 +2344,7 @@ class ProductPricingV0Api
      * @param  string[] $asins A list of up to twenty Amazon Standard Identification Number (ASIN) values used to identify items in the given marketplace. (optional)
      * @param  string[] $skus A list of up to twenty seller SKU values used to identify items in the given marketplace. (optional)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (optional)
-     * @param  string $offer_type Indicates whether to request pricing information for the seller&#39;s B2C or B2B offers. Default is B2C. (optional)
+     * @param  string $offer_type Indicates whether to request pricing information for the seller's B2C or B2B offers. Default is B2C. (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -2473,7 +2402,7 @@ class ProductPricingV0Api
      * @param  string[] $asins A list of up to twenty Amazon Standard Identification Number (ASIN) values used to identify items in the given marketplace. (optional)
      * @param  string[] $skus A list of up to twenty seller SKU values used to identify items in the given marketplace. (optional)
      * @param  string $item_condition Filters the offer listings based on item condition. Possible values: New, Used, Collectible, Refurbished, Club. (optional)
-     * @param  string $offer_type Indicates whether to request pricing information for the seller&#39;s B2C or B2B offers. Default is B2C. (optional)
+     * @param  string $offer_type Indicates whether to request pricing information for the seller's B2C or B2B offers. Default is B2C. (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
@@ -2612,35 +2541,4 @@ class ProductPricingV0Api
         );
     }
 
-    /**
-     * Create http client option
-     *
-     * @throws \RuntimeException on file opening failure
-     * @return array of http client options
-     */
-    protected function createHttpClientOption()
-    {
-        $options = [];
-        if ($this->config->getDebug()) {
-            $options[RequestOptions::DEBUG] = fopen($this->config->getDebugFile(), 'a');
-            if (!$options[RequestOptions::DEBUG]) {
-                throw new \RuntimeException('Failed to open the debug file: ' . $this->config->getDebugFile());
-            }
-        }
-
-        return $options;
-    }
-
-    /**
-     * Writes to the debug log file
-     *
-     * @param any $data
-     * @return void
-     */
-    private function writeDebug($data)
-    {
-        if ($this->config->getDebug()) {
-            file_put_contents($this->config->getDebugFile(), '[' . date('Y-m-d H:i:s') . ']: ' . print_r($data, true) . "\n", FILE_APPEND);
-        }
-    }
 }

@@ -26,15 +26,10 @@
 
 namespace SellingPartnerApi\Api;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\RequestOptions;
 use SellingPartnerApi\ApiException;
-use SellingPartnerApi\Configuration;
-use SellingPartnerApi\HeaderSelector;
 use SellingPartnerApi\ObjectSerializer;
 
 /**
@@ -43,79 +38,315 @@ use SellingPartnerApi\ObjectSerializer;
  * @category Class
  * @package  SellingPartnerApi
  */
-class OrdersV0Api
+class OrdersV0Api extends BaseApi
 {
     /**
-     * @var ClientInterface
-     */
-    protected $client;
-
-    /**
-     * @var Configuration
-     */
-    protected $config;
-
-    /**
-     * @var HeaderSelector
-     */
-    protected $headerSelector;
-
-    /**
-     * @var int Host index
-     */
-    protected $hostIndex;
-
-    /**
-     * @param Configuration   $config
-     * @param ClientInterface $client
-     * @param HeaderSelector  $selector
-     * @param int             $hostIndex (Optional) host index to select the list of hosts if defined in the OpenAPI spec
-     */
-    public function __construct(
-        Configuration $config,
-        ClientInterface $client = null,
-        HeaderSelector $selector = null,
-        $hostIndex = 0
-    ) {
-        $this->client = $client ?: new Client();
-        $this->config = $config;
-        $this->headerSelector = $selector ?: new HeaderSelector($this->config);
-        $this->hostIndex = $hostIndex;
-    }
-
-    /**
-     * Set the host index
+     * Operation confirmShipment
      *
-     * @param int $hostIndex Host index (required)
-     */
-    public function setHostIndex($hostIndex)
-    {
-        $this->hostIndex = $hostIndex;
-    }
-
-    /**
-     * Get the host index
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ConfirmShipmentRequest $payload Request body of confirmShipment. (required)
      *
-     * @return int Host index
+     * @throws \SellingPartnerApi\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return void
      */
-    public function getHostIndex()
+    public function confirmShipment($order_id, $payload)
     {
-        return $this->hostIndex;
+        $this->confirmShipmentWithHttpInfo($order_id, $payload);
     }
 
     /**
-     * @return Configuration
+     * Operation confirmShipmentWithHttpInfo
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ConfirmShipmentRequest $payload Request body of confirmShipment. (required)
+     *
+     * @throws \SellingPartnerApi\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
-    public function getConfig()
+    public function confirmShipmentWithHttpInfo($order_id, $payload)
     {
-        return $this->config;
+        $request = $this->confirmShipmentRequest($order_id, $payload);
+        $signedRequest = $this->config->signRequest(
+            $request
+        );
+
+        $this->writeDebug($signedRequest);
+        $this->writeDebug((string) $signedRequest->getBody());
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($signedRequest, $options);
+                $this->writeDebug($response);
+                $this->writeDebug((string) $response->getBody());
+            } catch (RequestException $e) {
+                $hasResponse = !empty($e->hasResponse());
+                $body = (string) ($hasResponse ? $e->getResponse()->getBody() : '[NULL response]');
+                $this->writeDebug($e->getResponse());
+                $this->writeDebug($body);
+                throw new ApiException(
+                    "[{$e->getCode()}] {$body}",
+                    $e->getCode(),
+                    $hasResponse ? $e->getResponse()->getHeaders() : [],
+                    $body
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $signedRequest->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()->getContents()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 400:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\ConfirmShipmentErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\ConfirmShipmentErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\ConfirmShipmentErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\ConfirmShipmentErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\ConfirmShipmentErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 500:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\ConfirmShipmentErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 503:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\ConfirmShipmentErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            $this->writeDebug($e);
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation confirmShipmentAsync
+     *
+     * 
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ConfirmShipmentRequest $payload Request body of confirmShipment. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function confirmShipmentAsync($order_id, $payload)
+    {
+        return $this->confirmShipmentAsyncWithHttpInfo($order_id, $payload);;
+    }
+
+    /**
+     * Operation confirmShipmentAsyncWithHttpInfo
+     *
+     * 
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ConfirmShipmentRequest $payload Request body of confirmShipment. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function confirmShipmentAsyncWithHttpInfo($order_id, $payload)
+    {
+        $returnType = '';
+        $request = $this->confirmShipmentRequest($order_id, $payload);
+        $signedRequest = $this->config->signRequest(
+            $request
+        );
+
+        $this->writeDebug($signedRequest);
+        $this->writeDebug((string) $signedRequest->getBody());
+
+        return $this->client
+            ->sendAsync($signedRequest, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $this->writeDebug($response);
+                    return null;
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $hasResponse = !empty($response);
+                    $body = (string) ($hasResponse ? $response->getBody() : '[NULL response]');
+                    $this->writeDebug($response);
+                    $statusCode = $hasResponse ? $response->getStatusCode() : $exception->getCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $hasResponse ? $response->getHeaders() : [],
+                        $body
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'confirmShipment'
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ConfirmShipmentRequest $payload Request body of confirmShipment. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function confirmShipmentRequest($order_id, $payload)
+    {
+        // verify the required parameter 'order_id' is set
+        if ($order_id === null || (is_array($order_id) && count($order_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $order_id when calling confirmShipment'
+            );
+        }
+        // verify the required parameter 'payload' is set
+        if ($payload === null || (is_array($payload) && count($payload) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $payload when calling confirmShipment'
+            );
+        }
+
+        $resourcePath = '/orders/v0/orders/{orderId}/shipmentConfirmation';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // path params
+        if ($order_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'orderId' . '}',
+                ObjectSerializer::toPathValue($order_id),
+                $resourcePath
+            );
+        }
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                ['application/json']
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                ['application/json'],
+                ['application/json']
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($payload)) {
+            if ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode(ObjectSerializer::sanitizeForSerialization($payload));
+            } else {
+                $httpBody = $payload;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\Query::build($formParams);
+            }
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\Query::build($queryParams);
+        return new Request(
+            'POST',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
     }
 
     /**
      * Operation getOrder
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -131,7 +362,7 @@ class OrdersV0Api
      * Operation getOrderWithHttpInfo
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -324,7 +555,7 @@ class OrdersV0Api
      * 
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -340,7 +571,7 @@ class OrdersV0Api
      * 
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -397,7 +628,7 @@ class OrdersV0Api
      * Create request for operation 'getOrder'
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
@@ -470,7 +701,6 @@ class OrdersV0Api
                 $httpBody = \GuzzleHttp\Psr7\Query::build($formParams);
             }
         }
-
 
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
@@ -839,7 +1069,6 @@ class OrdersV0Api
             }
         }
 
-
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
@@ -1207,7 +1436,6 @@ class OrdersV0Api
             }
         }
 
-
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
@@ -1233,7 +1461,7 @@ class OrdersV0Api
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \&quot;buyerInfo\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \"buyerInfo\") (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -1250,7 +1478,7 @@ class OrdersV0Api
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \&quot;buyerInfo\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \"buyerInfo\") (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -1444,7 +1672,7 @@ class OrdersV0Api
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \&quot;buyerInfo\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \"buyerInfo\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -1461,7 +1689,7 @@ class OrdersV0Api
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \&quot;buyerInfo\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \"buyerInfo\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -1519,7 +1747,7 @@ class OrdersV0Api
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \&quot;buyerInfo\&quot;) (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (the only valid array element is \"buyerInfo\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
@@ -1601,6 +1829,413 @@ class OrdersV0Api
             }
         }
 
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\Query::build($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation getOrderItemsApprovals
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format, e.g. 933-1671587-0818628. (required)
+     * @param  string $next_token A string token returned in the response of your previous request. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return approvals for items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return approvals that contain items which approval status is contained in the specified approval status. (optional)
+     *
+     * @throws \SellingPartnerApi\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse
+     */
+    public function getOrderItemsApprovals($order_id, $next_token = null, $item_approval_types = null, $item_approval_status = null)
+    {
+        $response = $this->getOrderItemsApprovalsWithHttpInfo($order_id, $next_token, $item_approval_types, $item_approval_status);
+        return $response;
+    }
+
+    /**
+     * Operation getOrderItemsApprovalsWithHttpInfo
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format, e.g. 933-1671587-0818628. (required)
+     * @param  string $next_token A string token returned in the response of your previous request. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return approvals for items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return approvals that contain items which approval status is contained in the specified approval status. (optional)
+     *
+     * @throws \SellingPartnerApi\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function getOrderItemsApprovalsWithHttpInfo($order_id, $next_token = null, $item_approval_types = null, $item_approval_status = null)
+    {
+        $request = $this->getOrderItemsApprovalsRequest($order_id, $next_token, $item_approval_types, $item_approval_status);
+        $signedRequest = $this->config->signRequest(
+            $request
+        );
+
+        $this->writeDebug($signedRequest);
+        $this->writeDebug((string) $signedRequest->getBody());
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($signedRequest, $options);
+                $this->writeDebug($response);
+                $this->writeDebug((string) $response->getBody());
+            } catch (RequestException $e) {
+                $hasResponse = !empty($e->hasResponse());
+                $body = (string) ($hasResponse ? $e->getResponse()->getBody() : '[NULL response]');
+                $this->writeDebug($e->getResponse());
+                $this->writeDebug($body);
+                throw new ApiException(
+                    "[{$e->getCode()}] {$body}",
+                    $e->getCode(),
+                    $hasResponse ? $e->getResponse()->getHeaders() : [],
+                    $body
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $signedRequest->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()->getContents()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            switch($statusCode) {
+                case 200:
+                    if ('\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse' === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = (string) $responseBody;
+                    }
+
+                    return ObjectSerializer::deserialize($content, '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse', $response->getHeaders());
+                case 400:
+                    if ('\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse' === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = (string) $responseBody;
+                    }
+
+                    return ObjectSerializer::deserialize($content, '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse', $response->getHeaders());
+                case 403:
+                    if ('\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse' === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = (string) $responseBody;
+                    }
+
+                    return ObjectSerializer::deserialize($content, '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse', $response->getHeaders());
+                case 404:
+                    if ('\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse' === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = (string) $responseBody;
+                    }
+
+                    return ObjectSerializer::deserialize($content, '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse', $response->getHeaders());
+                case 429:
+                    if ('\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse' === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = (string) $responseBody;
+                    }
+
+                    return ObjectSerializer::deserialize($content, '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse', $response->getHeaders());
+                case 500:
+                    if ('\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse' === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = (string) $responseBody;
+                    }
+
+                    return ObjectSerializer::deserialize($content, '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse', $response->getHeaders());
+                case 503:
+                    if ('\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse' === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = (string) $responseBody;
+                    }
+
+                    return ObjectSerializer::deserialize($content, '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse', $response->getHeaders());
+            }
+
+            $returnType = '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse';
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = (string) $responseBody;
+            }
+
+            return ObjectSerializer::deserialize($content, $returnType, $response->getHeaders());
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 400:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 500:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 503:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            $this->writeDebug($e);
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation getOrderItemsApprovalsAsync
+     *
+     * 
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format, e.g. 933-1671587-0818628. (required)
+     * @param  string $next_token A string token returned in the response of your previous request. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return approvals for items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return approvals that contain items which approval status is contained in the specified approval status. (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function getOrderItemsApprovalsAsync($order_id, $next_token = null, $item_approval_types = null, $item_approval_status = null)
+    {
+        return $this->getOrderItemsApprovalsAsyncWithHttpInfo($order_id, $next_token, $item_approval_types, $item_approval_status);;
+    }
+
+    /**
+     * Operation getOrderItemsApprovalsAsyncWithHttpInfo
+     *
+     * 
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format, e.g. 933-1671587-0818628. (required)
+     * @param  string $next_token A string token returned in the response of your previous request. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return approvals for items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return approvals that contain items which approval status is contained in the specified approval status. (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function getOrderItemsApprovalsAsyncWithHttpInfo($order_id, $next_token = null, $item_approval_types = null, $item_approval_status = null)
+    {
+        $returnType = '\SellingPartnerApi\Model\OrdersV0\GetOrderApprovalsResponse';
+        $request = $this->getOrderItemsApprovalsRequest($order_id, $next_token, $item_approval_types, $item_approval_status);
+        $signedRequest = $this->config->signRequest(
+            $request
+        );
+
+        $this->writeDebug($signedRequest);
+        $this->writeDebug((string) $signedRequest->getBody());
+
+        return $this->client
+            ->sendAsync($signedRequest, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $this->writeDebug($response);
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = (string) $responseBody;
+                    }
+
+                    return ObjectSerializer::deserialize($content, $returnType, $response->getHeaders());
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $hasResponse = !empty($response);
+                    $body = (string) ($hasResponse ? $response->getBody() : '[NULL response]');
+                    $this->writeDebug($response);
+                    $statusCode = $hasResponse ? $response->getStatusCode() : $exception->getCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $hasResponse ? $response->getHeaders() : [],
+                        $body
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'getOrderItemsApprovals'
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format, e.g. 933-1671587-0818628. (required)
+     * @param  string $next_token A string token returned in the response of your previous request. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return approvals for items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return approvals that contain items which approval status is contained in the specified approval status. (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function getOrderItemsApprovalsRequest($order_id, $next_token = null, $item_approval_types = null, $item_approval_status = null)
+    {
+        // verify the required parameter 'order_id' is set
+        if ($order_id === null || (is_array($order_id) && count($order_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $order_id when calling getOrderItemsApprovals'
+            );
+        }
+        if ($item_approval_types !== null && count($item_approval_types) > 1) {
+            throw new \InvalidArgumentException('invalid value for "$item_approval_types" when calling OrdersV0Api.getOrderItemsApprovals, number of items must be less than or equal to 1.');
+        }
+
+        if ($item_approval_status !== null && count($item_approval_status) > 6) {
+            throw new \InvalidArgumentException('invalid value for "$item_approval_status" when calling OrdersV0Api.getOrderItemsApprovals, number of items must be less than or equal to 6.');
+        }
+
+
+        $resourcePath = '/orders/v0/orders/{orderId}/approvals';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if (is_array($next_token)) {
+            $next_token = ObjectSerializer::serializeCollection($next_token, '', true);
+        }
+        if ($next_token !== null) {
+            $queryParams['NextToken'] = $next_token;
+        }
+
+        // query params
+        if (is_array($item_approval_types)) {
+            $item_approval_types = ObjectSerializer::serializeCollection($item_approval_types, 'form', true);
+        }
+        if ($item_approval_types !== null) {
+            $queryParams['ItemApprovalTypes'] = $item_approval_types;
+        }
+
+        // query params
+        if (is_array($item_approval_status)) {
+            $item_approval_status = ObjectSerializer::serializeCollection($item_approval_status, 'form', true);
+        }
+        if ($item_approval_status !== null) {
+            $queryParams['ItemApprovalStatus'] = $item_approval_status;
+        }
+
+        // path params
+        if ($order_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'orderId' . '}',
+                ObjectSerializer::toPathValue($order_id),
+                $resourcePath
+            );
+        }
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                ['application/json']
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                ['application/json'],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\Query::build($formParams);
+            }
+        }
 
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
@@ -1982,7 +2617,6 @@ class OrdersV0Api
             }
         }
 
-
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
@@ -2344,7 +2978,6 @@ class OrdersV0Api
             }
         }
 
-
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
@@ -2373,27 +3006,62 @@ class OrdersV0Api
      * @param  string $created_before A date used for selecting orders created before (or at) a specified time. Only orders placed before the specified time are returned. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_after A date used for selecting orders that were last updated after (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_before A date used for selecting orders that were last updated before (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
-     * @param  string[] $order_statuses A list of OrderStatus values used to filter the results. Possible values: PendingAvailability (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.); Pending (The order has been placed but payment has not been authorized); Unshipped (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped); PartiallyShipped (One or more, but not all, items in the order have been shipped); Shipped (All items in the order have been shipped); InvoiceUnconfirmed (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.); Canceled (The order has been canceled); and Unfulfillable (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.). (optional)
+     * @param  string[] $order_statuses A list of `OrderStatus` values used to filter the results.
+     *   **Possible values:**
+     *   - `PendingAvailability` (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.)
+     *   - `Pending` (The order has been placed but payment has not been authorized.)
+     *   - `Unshipped` (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped.)
+     *   - `PartiallyShipped` (One or more, but not all, items in the order have been shipped.)
+     *   - `Shipped` (All items in the order have been shipped.)
+     *   - `InvoiceUnconfirmed` (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.)
+     *   - `Canceled` (The order has been canceled.)
+     *   - `Unfulfillable` (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.) (optional)
      * @param  string[] $fulfillment_channels A list that indicates how an order was fulfilled. Filters the results by fulfillment channel. Possible values: AFN (Fulfillment by Amazon); MFN (Fulfilled by the seller). (optional)
      * @param  string[] $payment_methods A list of payment method values. Used to select orders paid using the specified payment methods. Possible values: COD (Cash on delivery); CVS (Convenience store payment); Other (Any payment method other than COD or CVS). (optional)
      * @param  string $buyer_email The email address of a buyer. Used to select orders that contain the specified email address. (optional)
      * @param  string $seller_order_id An order identifier that is specified by the seller. Used to select only the orders that match the order identifier. If SellerOrderId is specified, then FulfillmentChannels, OrderStatuses, PaymentMethod, LastUpdatedAfter, LastUpdatedBefore, and BuyerEmail cannot be specified. (optional)
      * @param  int $max_results_per_page A number that indicates the maximum number of orders that can be returned per page. Value must be 1 - 100. Default 100. (optional)
-     * @param  string[] $easy_ship_shipment_statuses A list of EasyShipShipmentStatus values. Used to select Easy Ship orders with statuses that match the specified  values. If EasyShipShipmentStatus is specified, only Amazon Easy Ship orders are returned.Possible values: PendingPickUp (Amazon has not yet picked up the package from the seller). LabelCanceled (The seller canceled the pickup). PickedUp (Amazon has picked up the package from the seller). AtOriginFC (The packaged is at the origin fulfillment center). AtDestinationFC (The package is at the destination fulfillment center). OutForDelivery (The package is out for delivery). Damaged (The package was damaged by the carrier). Delivered (The package has been delivered to the buyer). RejectedByBuyer (The package has been rejected by the buyer). Undeliverable (The package cannot be delivered). ReturnedToSeller (The package was not delivered to the buyer and was returned to the seller). ReturningToSeller (The package was not delivered to the buyer and is being returned to the seller). (optional)
+     * @param  string[] $easy_ship_shipment_statuses A list of `EasyShipShipmentStatus` values. Used to select Easy Ship orders with statuses that match the specified values. If `EasyShipShipmentStatus` is specified, only Amazon Easy Ship orders are returned.
+     *   **Possible values:**
+     *   - `PendingSchedule` (The package is awaiting the schedule for pick-up.)
+     *   - `PendingPickUp` (Amazon has not yet picked up the package from the seller.)
+     *   - `PendingDropOff` (The seller will deliver the package to the carrier.)
+     *   - `LabelCanceled` (The seller canceled the pickup.)
+     *   - `PickedUp` (Amazon has picked up the package from the seller.)
+     *   - `DroppedOff` (The package is delivered to the carrier by the seller.)
+     *   - `AtOriginFC` (The packaged is at the origin fulfillment center.)
+     *   - `AtDestinationFC` (The package is at the destination fulfillment center.)
+     *   - `Delivered` (The package has been delivered.)
+     *   - `RejectedByBuyer` (The package has been rejected by the buyer.)
+     *   - `Undeliverable` (The package cannot be delivered.)
+     *   - `ReturningToSeller` (The package was not delivered and is being returned to the seller.)
+     *   - `ReturnedToSeller` (The package was not delivered and was returned to the seller.)
+     *   - `Lost` (The package is lost.)
+     *   - `OutForDelivery` (The package is out for delivery.)
+     *   - `Damaged` (The package was damaged by the carrier.) (optional)
+     * @param  string[] $electronic_invoice_statuses A list of `ElectronicInvoiceStatus` values. Used to select orders with electronic invoice statuses that match the specified values.
+     *   **Possible values:**
+     *   - `NotRequired` (Electronic invoice submission is not required for this order.)
+     *   - `NotFound` (The electronic invoice was not submitted for this order.)
+     *   - `Processing` (The electronic invoice is being processed for this order.)
+     *   - `Errored` (The last submitted electronic invoice was rejected for this order.)
+     *   - `Accepted` (The last submitted electronic invoice was submitted and accepted.) (optional)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
      * @param  string[] $amazon_order_ids A list of AmazonOrderId values. An AmazonOrderId is an Amazon-defined order identifier, in 3-7-7 format. (optional)
      * @param  string $actual_fulfillment_supply_source_id Denotes the recommended sourceId where the order should be fulfilled from. (optional)
      * @param  bool $is_ispu When true, this order is marked to be picked up from a store rather than delivered. (optional)
      * @param  string $store_chain_store_id The store chain store identifier. Linked to a specific store in a store chain. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return orders that contain items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return orders that contain items which approval status is contained in the specified approval status. (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
      * @return \SellingPartnerApi\Model\OrdersV0\GetOrdersResponse
      */
-    public function getOrders($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $data_elements = null)
+    public function getOrders($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $electronic_invoice_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $item_approval_types = null, $item_approval_status = null, $data_elements = null)
     {
-        $response = $this->getOrdersWithHttpInfo($marketplace_ids, $created_after, $created_before, $last_updated_after, $last_updated_before, $order_statuses, $fulfillment_channels, $payment_methods, $buyer_email, $seller_order_id, $max_results_per_page, $easy_ship_shipment_statuses, $next_token, $amazon_order_ids, $actual_fulfillment_supply_source_id, $is_ispu, $store_chain_store_id, $data_elements);
+        $response = $this->getOrdersWithHttpInfo($marketplace_ids, $created_after, $created_before, $last_updated_after, $last_updated_before, $order_statuses, $fulfillment_channels, $payment_methods, $buyer_email, $seller_order_id, $max_results_per_page, $easy_ship_shipment_statuses, $electronic_invoice_statuses, $next_token, $amazon_order_ids, $actual_fulfillment_supply_source_id, $is_ispu, $store_chain_store_id, $item_approval_types, $item_approval_status, $data_elements);
         return $response;
     }
 
@@ -2405,27 +3073,62 @@ class OrdersV0Api
      * @param  string $created_before A date used for selecting orders created before (or at) a specified time. Only orders placed before the specified time are returned. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_after A date used for selecting orders that were last updated after (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_before A date used for selecting orders that were last updated before (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
-     * @param  string[] $order_statuses A list of OrderStatus values used to filter the results. Possible values: PendingAvailability (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.); Pending (The order has been placed but payment has not been authorized); Unshipped (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped); PartiallyShipped (One or more, but not all, items in the order have been shipped); Shipped (All items in the order have been shipped); InvoiceUnconfirmed (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.); Canceled (The order has been canceled); and Unfulfillable (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.). (optional)
+     * @param  string[] $order_statuses A list of `OrderStatus` values used to filter the results.
+     *   **Possible values:**
+     *   - `PendingAvailability` (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.)
+     *   - `Pending` (The order has been placed but payment has not been authorized.)
+     *   - `Unshipped` (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped.)
+     *   - `PartiallyShipped` (One or more, but not all, items in the order have been shipped.)
+     *   - `Shipped` (All items in the order have been shipped.)
+     *   - `InvoiceUnconfirmed` (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.)
+     *   - `Canceled` (The order has been canceled.)
+     *   - `Unfulfillable` (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.) (optional)
      * @param  string[] $fulfillment_channels A list that indicates how an order was fulfilled. Filters the results by fulfillment channel. Possible values: AFN (Fulfillment by Amazon); MFN (Fulfilled by the seller). (optional)
      * @param  string[] $payment_methods A list of payment method values. Used to select orders paid using the specified payment methods. Possible values: COD (Cash on delivery); CVS (Convenience store payment); Other (Any payment method other than COD or CVS). (optional)
      * @param  string $buyer_email The email address of a buyer. Used to select orders that contain the specified email address. (optional)
      * @param  string $seller_order_id An order identifier that is specified by the seller. Used to select only the orders that match the order identifier. If SellerOrderId is specified, then FulfillmentChannels, OrderStatuses, PaymentMethod, LastUpdatedAfter, LastUpdatedBefore, and BuyerEmail cannot be specified. (optional)
      * @param  int $max_results_per_page A number that indicates the maximum number of orders that can be returned per page. Value must be 1 - 100. Default 100. (optional)
-     * @param  string[] $easy_ship_shipment_statuses A list of EasyShipShipmentStatus values. Used to select Easy Ship orders with statuses that match the specified  values. If EasyShipShipmentStatus is specified, only Amazon Easy Ship orders are returned.Possible values: PendingPickUp (Amazon has not yet picked up the package from the seller). LabelCanceled (The seller canceled the pickup). PickedUp (Amazon has picked up the package from the seller). AtOriginFC (The packaged is at the origin fulfillment center). AtDestinationFC (The package is at the destination fulfillment center). OutForDelivery (The package is out for delivery). Damaged (The package was damaged by the carrier). Delivered (The package has been delivered to the buyer). RejectedByBuyer (The package has been rejected by the buyer). Undeliverable (The package cannot be delivered). ReturnedToSeller (The package was not delivered to the buyer and was returned to the seller). ReturningToSeller (The package was not delivered to the buyer and is being returned to the seller). (optional)
+     * @param  string[] $easy_ship_shipment_statuses A list of `EasyShipShipmentStatus` values. Used to select Easy Ship orders with statuses that match the specified values. If `EasyShipShipmentStatus` is specified, only Amazon Easy Ship orders are returned.
+     *   **Possible values:**
+     *   - `PendingSchedule` (The package is awaiting the schedule for pick-up.)
+     *   - `PendingPickUp` (Amazon has not yet picked up the package from the seller.)
+     *   - `PendingDropOff` (The seller will deliver the package to the carrier.)
+     *   - `LabelCanceled` (The seller canceled the pickup.)
+     *   - `PickedUp` (Amazon has picked up the package from the seller.)
+     *   - `DroppedOff` (The package is delivered to the carrier by the seller.)
+     *   - `AtOriginFC` (The packaged is at the origin fulfillment center.)
+     *   - `AtDestinationFC` (The package is at the destination fulfillment center.)
+     *   - `Delivered` (The package has been delivered.)
+     *   - `RejectedByBuyer` (The package has been rejected by the buyer.)
+     *   - `Undeliverable` (The package cannot be delivered.)
+     *   - `ReturningToSeller` (The package was not delivered and is being returned to the seller.)
+     *   - `ReturnedToSeller` (The package was not delivered and was returned to the seller.)
+     *   - `Lost` (The package is lost.)
+     *   - `OutForDelivery` (The package is out for delivery.)
+     *   - `Damaged` (The package was damaged by the carrier.) (optional)
+     * @param  string[] $electronic_invoice_statuses A list of `ElectronicInvoiceStatus` values. Used to select orders with electronic invoice statuses that match the specified values.
+     *   **Possible values:**
+     *   - `NotRequired` (Electronic invoice submission is not required for this order.)
+     *   - `NotFound` (The electronic invoice was not submitted for this order.)
+     *   - `Processing` (The electronic invoice is being processed for this order.)
+     *   - `Errored` (The last submitted electronic invoice was rejected for this order.)
+     *   - `Accepted` (The last submitted electronic invoice was submitted and accepted.) (optional)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
      * @param  string[] $amazon_order_ids A list of AmazonOrderId values. An AmazonOrderId is an Amazon-defined order identifier, in 3-7-7 format. (optional)
      * @param  string $actual_fulfillment_supply_source_id Denotes the recommended sourceId where the order should be fulfilled from. (optional)
      * @param  bool $is_ispu When true, this order is marked to be picked up from a store rather than delivered. (optional)
      * @param  string $store_chain_store_id The store chain store identifier. Linked to a specific store in a store chain. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return orders that contain items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return orders that contain items which approval status is contained in the specified approval status. (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
      * @return array of \SellingPartnerApi\Model\OrdersV0\GetOrdersResponse, HTTP status code, HTTP response headers (array of strings)
      */
-    public function getOrdersWithHttpInfo($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $data_elements = null)
+    public function getOrdersWithHttpInfo($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $electronic_invoice_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $item_approval_types = null, $item_approval_status = null, $data_elements = null)
     {
-        $request = $this->getOrdersRequest($marketplace_ids, $created_after, $created_before, $last_updated_after, $last_updated_before, $order_statuses, $fulfillment_channels, $payment_methods, $buyer_email, $seller_order_id, $max_results_per_page, $easy_ship_shipment_statuses, $next_token, $amazon_order_ids, $actual_fulfillment_supply_source_id, $is_ispu, $store_chain_store_id, $data_elements);
+        $request = $this->getOrdersRequest($marketplace_ids, $created_after, $created_before, $last_updated_after, $last_updated_before, $order_statuses, $fulfillment_channels, $payment_methods, $buyer_email, $seller_order_id, $max_results_per_page, $easy_ship_shipment_statuses, $electronic_invoice_statuses, $next_token, $amazon_order_ids, $actual_fulfillment_supply_source_id, $is_ispu, $store_chain_store_id, $item_approval_types, $item_approval_status, $data_elements);
         $signedRequest = $this->config->signRequest(
             $request,
             null,
@@ -2614,26 +3317,61 @@ class OrdersV0Api
      * @param  string $created_before A date used for selecting orders created before (or at) a specified time. Only orders placed before the specified time are returned. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_after A date used for selecting orders that were last updated after (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_before A date used for selecting orders that were last updated before (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
-     * @param  string[] $order_statuses A list of OrderStatus values used to filter the results. Possible values: PendingAvailability (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.); Pending (The order has been placed but payment has not been authorized); Unshipped (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped); PartiallyShipped (One or more, but not all, items in the order have been shipped); Shipped (All items in the order have been shipped); InvoiceUnconfirmed (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.); Canceled (The order has been canceled); and Unfulfillable (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.). (optional)
+     * @param  string[] $order_statuses A list of `OrderStatus` values used to filter the results.
+     *   **Possible values:**
+     *   - `PendingAvailability` (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.)
+     *   - `Pending` (The order has been placed but payment has not been authorized.)
+     *   - `Unshipped` (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped.)
+     *   - `PartiallyShipped` (One or more, but not all, items in the order have been shipped.)
+     *   - `Shipped` (All items in the order have been shipped.)
+     *   - `InvoiceUnconfirmed` (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.)
+     *   - `Canceled` (The order has been canceled.)
+     *   - `Unfulfillable` (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.) (optional)
      * @param  string[] $fulfillment_channels A list that indicates how an order was fulfilled. Filters the results by fulfillment channel. Possible values: AFN (Fulfillment by Amazon); MFN (Fulfilled by the seller). (optional)
      * @param  string[] $payment_methods A list of payment method values. Used to select orders paid using the specified payment methods. Possible values: COD (Cash on delivery); CVS (Convenience store payment); Other (Any payment method other than COD or CVS). (optional)
      * @param  string $buyer_email The email address of a buyer. Used to select orders that contain the specified email address. (optional)
      * @param  string $seller_order_id An order identifier that is specified by the seller. Used to select only the orders that match the order identifier. If SellerOrderId is specified, then FulfillmentChannels, OrderStatuses, PaymentMethod, LastUpdatedAfter, LastUpdatedBefore, and BuyerEmail cannot be specified. (optional)
      * @param  int $max_results_per_page A number that indicates the maximum number of orders that can be returned per page. Value must be 1 - 100. Default 100. (optional)
-     * @param  string[] $easy_ship_shipment_statuses A list of EasyShipShipmentStatus values. Used to select Easy Ship orders with statuses that match the specified  values. If EasyShipShipmentStatus is specified, only Amazon Easy Ship orders are returned.Possible values: PendingPickUp (Amazon has not yet picked up the package from the seller). LabelCanceled (The seller canceled the pickup). PickedUp (Amazon has picked up the package from the seller). AtOriginFC (The packaged is at the origin fulfillment center). AtDestinationFC (The package is at the destination fulfillment center). OutForDelivery (The package is out for delivery). Damaged (The package was damaged by the carrier). Delivered (The package has been delivered to the buyer). RejectedByBuyer (The package has been rejected by the buyer). Undeliverable (The package cannot be delivered). ReturnedToSeller (The package was not delivered to the buyer and was returned to the seller). ReturningToSeller (The package was not delivered to the buyer and is being returned to the seller). (optional)
+     * @param  string[] $easy_ship_shipment_statuses A list of `EasyShipShipmentStatus` values. Used to select Easy Ship orders with statuses that match the specified values. If `EasyShipShipmentStatus` is specified, only Amazon Easy Ship orders are returned.
+     *   **Possible values:**
+     *   - `PendingSchedule` (The package is awaiting the schedule for pick-up.)
+     *   - `PendingPickUp` (Amazon has not yet picked up the package from the seller.)
+     *   - `PendingDropOff` (The seller will deliver the package to the carrier.)
+     *   - `LabelCanceled` (The seller canceled the pickup.)
+     *   - `PickedUp` (Amazon has picked up the package from the seller.)
+     *   - `DroppedOff` (The package is delivered to the carrier by the seller.)
+     *   - `AtOriginFC` (The packaged is at the origin fulfillment center.)
+     *   - `AtDestinationFC` (The package is at the destination fulfillment center.)
+     *   - `Delivered` (The package has been delivered.)
+     *   - `RejectedByBuyer` (The package has been rejected by the buyer.)
+     *   - `Undeliverable` (The package cannot be delivered.)
+     *   - `ReturningToSeller` (The package was not delivered and is being returned to the seller.)
+     *   - `ReturnedToSeller` (The package was not delivered and was returned to the seller.)
+     *   - `Lost` (The package is lost.)
+     *   - `OutForDelivery` (The package is out for delivery.)
+     *   - `Damaged` (The package was damaged by the carrier.) (optional)
+     * @param  string[] $electronic_invoice_statuses A list of `ElectronicInvoiceStatus` values. Used to select orders with electronic invoice statuses that match the specified values.
+     *   **Possible values:**
+     *   - `NotRequired` (Electronic invoice submission is not required for this order.)
+     *   - `NotFound` (The electronic invoice was not submitted for this order.)
+     *   - `Processing` (The electronic invoice is being processed for this order.)
+     *   - `Errored` (The last submitted electronic invoice was rejected for this order.)
+     *   - `Accepted` (The last submitted electronic invoice was submitted and accepted.) (optional)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
      * @param  string[] $amazon_order_ids A list of AmazonOrderId values. An AmazonOrderId is an Amazon-defined order identifier, in 3-7-7 format. (optional)
      * @param  string $actual_fulfillment_supply_source_id Denotes the recommended sourceId where the order should be fulfilled from. (optional)
      * @param  bool $is_ispu When true, this order is marked to be picked up from a store rather than delivered. (optional)
      * @param  string $store_chain_store_id The store chain store identifier. Linked to a specific store in a store chain. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return orders that contain items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return orders that contain items which approval status is contained in the specified approval status. (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function getOrdersAsync($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $data_elements = null)
+    public function getOrdersAsync($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $electronic_invoice_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $item_approval_types = null, $item_approval_status = null, $data_elements = null)
     {
-        return $this->getOrdersAsyncWithHttpInfo($marketplace_ids, $created_after, $created_before, $last_updated_after, $last_updated_before, $order_statuses, $fulfillment_channels, $payment_methods, $buyer_email, $seller_order_id, $max_results_per_page, $easy_ship_shipment_statuses, $next_token, $amazon_order_ids, $actual_fulfillment_supply_source_id, $is_ispu, $store_chain_store_id, $data_elements);;
+        return $this->getOrdersAsyncWithHttpInfo($marketplace_ids, $created_after, $created_before, $last_updated_after, $last_updated_before, $order_statuses, $fulfillment_channels, $payment_methods, $buyer_email, $seller_order_id, $max_results_per_page, $easy_ship_shipment_statuses, $electronic_invoice_statuses, $next_token, $amazon_order_ids, $actual_fulfillment_supply_source_id, $is_ispu, $store_chain_store_id, $item_approval_types, $item_approval_status, $data_elements);;
     }
 
     /**
@@ -2646,27 +3384,62 @@ class OrdersV0Api
      * @param  string $created_before A date used for selecting orders created before (or at) a specified time. Only orders placed before the specified time are returned. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_after A date used for selecting orders that were last updated after (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_before A date used for selecting orders that were last updated before (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
-     * @param  string[] $order_statuses A list of OrderStatus values used to filter the results. Possible values: PendingAvailability (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.); Pending (The order has been placed but payment has not been authorized); Unshipped (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped); PartiallyShipped (One or more, but not all, items in the order have been shipped); Shipped (All items in the order have been shipped); InvoiceUnconfirmed (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.); Canceled (The order has been canceled); and Unfulfillable (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.). (optional)
+     * @param  string[] $order_statuses A list of `OrderStatus` values used to filter the results.
+     *   **Possible values:**
+     *   - `PendingAvailability` (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.)
+     *   - `Pending` (The order has been placed but payment has not been authorized.)
+     *   - `Unshipped` (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped.)
+     *   - `PartiallyShipped` (One or more, but not all, items in the order have been shipped.)
+     *   - `Shipped` (All items in the order have been shipped.)
+     *   - `InvoiceUnconfirmed` (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.)
+     *   - `Canceled` (The order has been canceled.)
+     *   - `Unfulfillable` (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.) (optional)
      * @param  string[] $fulfillment_channels A list that indicates how an order was fulfilled. Filters the results by fulfillment channel. Possible values: AFN (Fulfillment by Amazon); MFN (Fulfilled by the seller). (optional)
      * @param  string[] $payment_methods A list of payment method values. Used to select orders paid using the specified payment methods. Possible values: COD (Cash on delivery); CVS (Convenience store payment); Other (Any payment method other than COD or CVS). (optional)
      * @param  string $buyer_email The email address of a buyer. Used to select orders that contain the specified email address. (optional)
      * @param  string $seller_order_id An order identifier that is specified by the seller. Used to select only the orders that match the order identifier. If SellerOrderId is specified, then FulfillmentChannels, OrderStatuses, PaymentMethod, LastUpdatedAfter, LastUpdatedBefore, and BuyerEmail cannot be specified. (optional)
      * @param  int $max_results_per_page A number that indicates the maximum number of orders that can be returned per page. Value must be 1 - 100. Default 100. (optional)
-     * @param  string[] $easy_ship_shipment_statuses A list of EasyShipShipmentStatus values. Used to select Easy Ship orders with statuses that match the specified  values. If EasyShipShipmentStatus is specified, only Amazon Easy Ship orders are returned.Possible values: PendingPickUp (Amazon has not yet picked up the package from the seller). LabelCanceled (The seller canceled the pickup). PickedUp (Amazon has picked up the package from the seller). AtOriginFC (The packaged is at the origin fulfillment center). AtDestinationFC (The package is at the destination fulfillment center). OutForDelivery (The package is out for delivery). Damaged (The package was damaged by the carrier). Delivered (The package has been delivered to the buyer). RejectedByBuyer (The package has been rejected by the buyer). Undeliverable (The package cannot be delivered). ReturnedToSeller (The package was not delivered to the buyer and was returned to the seller). ReturningToSeller (The package was not delivered to the buyer and is being returned to the seller). (optional)
+     * @param  string[] $easy_ship_shipment_statuses A list of `EasyShipShipmentStatus` values. Used to select Easy Ship orders with statuses that match the specified values. If `EasyShipShipmentStatus` is specified, only Amazon Easy Ship orders are returned.
+     *   **Possible values:**
+     *   - `PendingSchedule` (The package is awaiting the schedule for pick-up.)
+     *   - `PendingPickUp` (Amazon has not yet picked up the package from the seller.)
+     *   - `PendingDropOff` (The seller will deliver the package to the carrier.)
+     *   - `LabelCanceled` (The seller canceled the pickup.)
+     *   - `PickedUp` (Amazon has picked up the package from the seller.)
+     *   - `DroppedOff` (The package is delivered to the carrier by the seller.)
+     *   - `AtOriginFC` (The packaged is at the origin fulfillment center.)
+     *   - `AtDestinationFC` (The package is at the destination fulfillment center.)
+     *   - `Delivered` (The package has been delivered.)
+     *   - `RejectedByBuyer` (The package has been rejected by the buyer.)
+     *   - `Undeliverable` (The package cannot be delivered.)
+     *   - `ReturningToSeller` (The package was not delivered and is being returned to the seller.)
+     *   - `ReturnedToSeller` (The package was not delivered and was returned to the seller.)
+     *   - `Lost` (The package is lost.)
+     *   - `OutForDelivery` (The package is out for delivery.)
+     *   - `Damaged` (The package was damaged by the carrier.) (optional)
+     * @param  string[] $electronic_invoice_statuses A list of `ElectronicInvoiceStatus` values. Used to select orders with electronic invoice statuses that match the specified values.
+     *   **Possible values:**
+     *   - `NotRequired` (Electronic invoice submission is not required for this order.)
+     *   - `NotFound` (The electronic invoice was not submitted for this order.)
+     *   - `Processing` (The electronic invoice is being processed for this order.)
+     *   - `Errored` (The last submitted electronic invoice was rejected for this order.)
+     *   - `Accepted` (The last submitted electronic invoice was submitted and accepted.) (optional)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
      * @param  string[] $amazon_order_ids A list of AmazonOrderId values. An AmazonOrderId is an Amazon-defined order identifier, in 3-7-7 format. (optional)
      * @param  string $actual_fulfillment_supply_source_id Denotes the recommended sourceId where the order should be fulfilled from. (optional)
      * @param  bool $is_ispu When true, this order is marked to be picked up from a store rather than delivered. (optional)
      * @param  string $store_chain_store_id The store chain store identifier. Linked to a specific store in a store chain. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return orders that contain items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return orders that contain items which approval status is contained in the specified approval status. (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function getOrdersAsyncWithHttpInfo($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $data_elements = null)
+    public function getOrdersAsyncWithHttpInfo($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $electronic_invoice_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $item_approval_types = null, $item_approval_status = null, $data_elements = null)
     {
         $returnType = '\SellingPartnerApi\Model\OrdersV0\GetOrdersResponse';
-        $request = $this->getOrdersRequest($marketplace_ids, $created_after, $created_before, $last_updated_after, $last_updated_before, $order_statuses, $fulfillment_channels, $payment_methods, $buyer_email, $seller_order_id, $max_results_per_page, $easy_ship_shipment_statuses, $next_token, $amazon_order_ids, $actual_fulfillment_supply_source_id, $is_ispu, $store_chain_store_id, $data_elements);
+        $request = $this->getOrdersRequest($marketplace_ids, $created_after, $created_before, $last_updated_after, $last_updated_before, $order_statuses, $fulfillment_channels, $payment_methods, $buyer_email, $seller_order_id, $max_results_per_page, $easy_ship_shipment_statuses, $electronic_invoice_statuses, $next_token, $amazon_order_ids, $actual_fulfillment_supply_source_id, $is_ispu, $store_chain_store_id, $item_approval_types, $item_approval_status, $data_elements);
         $signedRequest = $this->config->signRequest(
             $request,
             null,
@@ -2719,24 +3492,59 @@ class OrdersV0Api
      * @param  string $created_before A date used for selecting orders created before (or at) a specified time. Only orders placed before the specified time are returned. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_after A date used for selecting orders that were last updated after (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
      * @param  string $last_updated_before A date used for selecting orders that were last updated before (or at) a specified time. An update is defined as any change in order status, including the creation of a new order. Includes updates made by Amazon and by the seller. The date must be in ISO 8601 format. (optional)
-     * @param  string[] $order_statuses A list of OrderStatus values used to filter the results. Possible values: PendingAvailability (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.); Pending (The order has been placed but payment has not been authorized); Unshipped (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped); PartiallyShipped (One or more, but not all, items in the order have been shipped); Shipped (All items in the order have been shipped); InvoiceUnconfirmed (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.); Canceled (The order has been canceled); and Unfulfillable (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.). (optional)
+     * @param  string[] $order_statuses A list of `OrderStatus` values used to filter the results.
+     *   **Possible values:**
+     *   - `PendingAvailability` (This status is available for pre-orders only. The order has been placed, payment has not been authorized, and the release date of the item is in the future.)
+     *   - `Pending` (The order has been placed but payment has not been authorized.)
+     *   - `Unshipped` (Payment has been authorized and the order is ready for shipment, but no items in the order have been shipped.)
+     *   - `PartiallyShipped` (One or more, but not all, items in the order have been shipped.)
+     *   - `Shipped` (All items in the order have been shipped.)
+     *   - `InvoiceUnconfirmed` (All items in the order have been shipped. The seller has not yet given confirmation to Amazon that the invoice has been shipped to the buyer.)
+     *   - `Canceled` (The order has been canceled.)
+     *   - `Unfulfillable` (The order cannot be fulfilled. This state applies only to Multi-Channel Fulfillment orders.) (optional)
      * @param  string[] $fulfillment_channels A list that indicates how an order was fulfilled. Filters the results by fulfillment channel. Possible values: AFN (Fulfillment by Amazon); MFN (Fulfilled by the seller). (optional)
      * @param  string[] $payment_methods A list of payment method values. Used to select orders paid using the specified payment methods. Possible values: COD (Cash on delivery); CVS (Convenience store payment); Other (Any payment method other than COD or CVS). (optional)
      * @param  string $buyer_email The email address of a buyer. Used to select orders that contain the specified email address. (optional)
      * @param  string $seller_order_id An order identifier that is specified by the seller. Used to select only the orders that match the order identifier. If SellerOrderId is specified, then FulfillmentChannels, OrderStatuses, PaymentMethod, LastUpdatedAfter, LastUpdatedBefore, and BuyerEmail cannot be specified. (optional)
      * @param  int $max_results_per_page A number that indicates the maximum number of orders that can be returned per page. Value must be 1 - 100. Default 100. (optional)
-     * @param  string[] $easy_ship_shipment_statuses A list of EasyShipShipmentStatus values. Used to select Easy Ship orders with statuses that match the specified  values. If EasyShipShipmentStatus is specified, only Amazon Easy Ship orders are returned.Possible values: PendingPickUp (Amazon has not yet picked up the package from the seller). LabelCanceled (The seller canceled the pickup). PickedUp (Amazon has picked up the package from the seller). AtOriginFC (The packaged is at the origin fulfillment center). AtDestinationFC (The package is at the destination fulfillment center). OutForDelivery (The package is out for delivery). Damaged (The package was damaged by the carrier). Delivered (The package has been delivered to the buyer). RejectedByBuyer (The package has been rejected by the buyer). Undeliverable (The package cannot be delivered). ReturnedToSeller (The package was not delivered to the buyer and was returned to the seller). ReturningToSeller (The package was not delivered to the buyer and is being returned to the seller). (optional)
+     * @param  string[] $easy_ship_shipment_statuses A list of `EasyShipShipmentStatus` values. Used to select Easy Ship orders with statuses that match the specified values. If `EasyShipShipmentStatus` is specified, only Amazon Easy Ship orders are returned.
+     *   **Possible values:**
+     *   - `PendingSchedule` (The package is awaiting the schedule for pick-up.)
+     *   - `PendingPickUp` (Amazon has not yet picked up the package from the seller.)
+     *   - `PendingDropOff` (The seller will deliver the package to the carrier.)
+     *   - `LabelCanceled` (The seller canceled the pickup.)
+     *   - `PickedUp` (Amazon has picked up the package from the seller.)
+     *   - `DroppedOff` (The package is delivered to the carrier by the seller.)
+     *   - `AtOriginFC` (The packaged is at the origin fulfillment center.)
+     *   - `AtDestinationFC` (The package is at the destination fulfillment center.)
+     *   - `Delivered` (The package has been delivered.)
+     *   - `RejectedByBuyer` (The package has been rejected by the buyer.)
+     *   - `Undeliverable` (The package cannot be delivered.)
+     *   - `ReturningToSeller` (The package was not delivered and is being returned to the seller.)
+     *   - `ReturnedToSeller` (The package was not delivered and was returned to the seller.)
+     *   - `Lost` (The package is lost.)
+     *   - `OutForDelivery` (The package is out for delivery.)
+     *   - `Damaged` (The package was damaged by the carrier.) (optional)
+     * @param  string[] $electronic_invoice_statuses A list of `ElectronicInvoiceStatus` values. Used to select orders with electronic invoice statuses that match the specified values.
+     *   **Possible values:**
+     *   - `NotRequired` (Electronic invoice submission is not required for this order.)
+     *   - `NotFound` (The electronic invoice was not submitted for this order.)
+     *   - `Processing` (The electronic invoice is being processed for this order.)
+     *   - `Errored` (The last submitted electronic invoice was rejected for this order.)
+     *   - `Accepted` (The last submitted electronic invoice was submitted and accepted.) (optional)
      * @param  string $next_token A string token returned in the response of your previous request. (optional)
      * @param  string[] $amazon_order_ids A list of AmazonOrderId values. An AmazonOrderId is an Amazon-defined order identifier, in 3-7-7 format. (optional)
      * @param  string $actual_fulfillment_supply_source_id Denotes the recommended sourceId where the order should be fulfilled from. (optional)
      * @param  bool $is_ispu When true, this order is marked to be picked up from a store rather than delivered. (optional)
      * @param  string $store_chain_store_id The store chain store identifier. Linked to a specific store in a store chain. (optional)
-     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \&quot;buyerInfo\&quot; and \&quot;shippingAddress\&quot;) (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalType[] $item_approval_types When set, only return orders that contain items which approval type is contained in the specified approval types. (optional)
+     * @param  \SellingPartnerApi\Model\OrdersV0\ItemApprovalStatus[] $item_approval_status When set, only return orders that contain items which approval status is contained in the specified approval status. (optional)
+     * @param  string[] $data_elements An array of restricted order data elements to retrieve (valid array elements are \"buyerInfo\" and \"shippingAddress\") (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function getOrdersRequest($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $data_elements = null)
+    public function getOrdersRequest($marketplace_ids, $created_after = null, $created_before = null, $last_updated_after = null, $last_updated_before = null, $order_statuses = null, $fulfillment_channels = null, $payment_methods = null, $buyer_email = null, $seller_order_id = null, $max_results_per_page = null, $easy_ship_shipment_statuses = null, $electronic_invoice_statuses = null, $next_token = null, $amazon_order_ids = null, $actual_fulfillment_supply_source_id = null, $is_ispu = null, $store_chain_store_id = null, $item_approval_types = null, $item_approval_status = null, $data_elements = null)
     {
         // verify the required parameter 'marketplace_ids' is set
         if ($marketplace_ids === null || (is_array($marketplace_ids) && count($marketplace_ids) === 0)) {
@@ -2750,6 +3558,14 @@ class OrdersV0Api
 
         if ($amazon_order_ids !== null && count($amazon_order_ids) > 50) {
             throw new \InvalidArgumentException('invalid value for "$amazon_order_ids" when calling OrdersV0Api.getOrders, number of items must be less than or equal to 50.');
+        }
+
+        if ($item_approval_types !== null && count($item_approval_types) > 1) {
+            throw new \InvalidArgumentException('invalid value for "$item_approval_types" when calling OrdersV0Api.getOrders, number of items must be less than or equal to 1.');
+        }
+
+        if ($item_approval_status !== null && count($item_approval_status) > 6) {
+            throw new \InvalidArgumentException('invalid value for "$item_approval_status" when calling OrdersV0Api.getOrders, number of items must be less than or equal to 6.');
         }
 
 
@@ -2857,6 +3673,14 @@ class OrdersV0Api
         }
 
         // query params
+        if (is_array($electronic_invoice_statuses)) {
+            $electronic_invoice_statuses = ObjectSerializer::serializeCollection($electronic_invoice_statuses, 'form', true);
+        }
+        if ($electronic_invoice_statuses !== null) {
+            $queryParams['ElectronicInvoiceStatuses'] = $electronic_invoice_statuses;
+        }
+
+        // query params
         if (is_array($next_token)) {
             $next_token = ObjectSerializer::serializeCollection($next_token, '', true);
         }
@@ -2894,6 +3718,22 @@ class OrdersV0Api
         }
         if ($store_chain_store_id !== null) {
             $queryParams['StoreChainStoreId'] = $store_chain_store_id;
+        }
+
+        // query params
+        if (is_array($item_approval_types)) {
+            $item_approval_types = ObjectSerializer::serializeCollection($item_approval_types, 'form', true);
+        }
+        if ($item_approval_types !== null) {
+            $queryParams['ItemApprovalTypes'] = $item_approval_types;
+        }
+
+        // query params
+        if (is_array($item_approval_status)) {
+            $item_approval_status = ObjectSerializer::serializeCollection($item_approval_status, 'form', true);
+        }
+        if ($item_approval_status !== null) {
+            $queryParams['ItemApprovalStatus'] = $item_approval_status;
         }
 
         // query params
@@ -2940,7 +3780,6 @@ class OrdersV0Api
             }
         }
 
-
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
@@ -2962,10 +3801,320 @@ class OrdersV0Api
     }
 
     /**
+     * Operation updateOrderItemsApprovals
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateOrderApprovalsRequest $payload The request body for the updateOrderItemsApprovals operation. (required)
+     *
+     * @throws \SellingPartnerApi\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function updateOrderItemsApprovals($order_id, $payload)
+    {
+        $this->updateOrderItemsApprovalsWithHttpInfo($order_id, $payload);
+    }
+
+    /**
+     * Operation updateOrderItemsApprovalsWithHttpInfo
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateOrderApprovalsRequest $payload The request body for the updateOrderItemsApprovals operation. (required)
+     *
+     * @throws \SellingPartnerApi\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function updateOrderItemsApprovalsWithHttpInfo($order_id, $payload)
+    {
+        $request = $this->updateOrderItemsApprovalsRequest($order_id, $payload);
+        $signedRequest = $this->config->signRequest(
+            $request
+        );
+
+        $this->writeDebug($signedRequest);
+        $this->writeDebug((string) $signedRequest->getBody());
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($signedRequest, $options);
+                $this->writeDebug($response);
+                $this->writeDebug((string) $response->getBody());
+            } catch (RequestException $e) {
+                $hasResponse = !empty($e->hasResponse());
+                $body = (string) ($hasResponse ? $e->getResponse()->getBody() : '[NULL response]');
+                $this->writeDebug($e->getResponse());
+                $this->writeDebug($body);
+                throw new ApiException(
+                    "[{$e->getCode()}] {$body}",
+                    $e->getCode(),
+                    $hasResponse ? $e->getResponse()->getHeaders() : [],
+                    $body
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $signedRequest->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()->getContents()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 400:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\UpdateItemsApprovalsErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\UpdateItemsApprovalsErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\UpdateItemsApprovalsErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 413:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\UpdateItemsApprovalsErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 415:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\UpdateItemsApprovalsErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\UpdateItemsApprovalsErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 500:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\UpdateItemsApprovalsErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 503:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SellingPartnerApi\Model\OrdersV0\UpdateItemsApprovalsErrorResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            $this->writeDebug($e);
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation updateOrderItemsApprovalsAsync
+     *
+     * 
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateOrderApprovalsRequest $payload The request body for the updateOrderItemsApprovals operation. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function updateOrderItemsApprovalsAsync($order_id, $payload)
+    {
+        return $this->updateOrderItemsApprovalsAsyncWithHttpInfo($order_id, $payload);;
+    }
+
+    /**
+     * Operation updateOrderItemsApprovalsAsyncWithHttpInfo
+     *
+     * 
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateOrderApprovalsRequest $payload The request body for the updateOrderItemsApprovals operation. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function updateOrderItemsApprovalsAsyncWithHttpInfo($order_id, $payload)
+    {
+        $returnType = '';
+        $request = $this->updateOrderItemsApprovalsRequest($order_id, $payload);
+        $signedRequest = $this->config->signRequest(
+            $request
+        );
+
+        $this->writeDebug($signedRequest);
+        $this->writeDebug((string) $signedRequest->getBody());
+
+        return $this->client
+            ->sendAsync($signedRequest, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $this->writeDebug($response);
+                    return null;
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $hasResponse = !empty($response);
+                    $body = (string) ($hasResponse ? $response->getBody() : '[NULL response]');
+                    $this->writeDebug($response);
+                    $statusCode = $hasResponse ? $response->getStatusCode() : $exception->getCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $hasResponse ? $response->getHeaders() : [],
+                        $body
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'updateOrderItemsApprovals'
+     *
+     * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateOrderApprovalsRequest $payload The request body for the updateOrderItemsApprovals operation. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function updateOrderItemsApprovalsRequest($order_id, $payload)
+    {
+        // verify the required parameter 'order_id' is set
+        if ($order_id === null || (is_array($order_id) && count($order_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $order_id when calling updateOrderItemsApprovals'
+            );
+        }
+        // verify the required parameter 'payload' is set
+        if ($payload === null || (is_array($payload) && count($payload) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $payload when calling updateOrderItemsApprovals'
+            );
+        }
+
+        $resourcePath = '/orders/v0/orders/{orderId}/approvals';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // path params
+        if ($order_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'orderId' . '}',
+                ObjectSerializer::toPathValue($order_id),
+                $resourcePath
+            );
+        }
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                ['application/json']
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                ['application/json'],
+                ['application/json']
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($payload)) {
+            if ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode(ObjectSerializer::sanitizeForSerialization($payload));
+            } else {
+                $httpBody = $payload;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\Query::build($formParams);
+            }
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\Query::build($queryParams);
+        return new Request(
+            'POST',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation updateShipmentStatus
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload Request to update the shipment status. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload The request body for the updateShipmentStatus operation. (required)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -2980,7 +4129,7 @@ class OrdersV0Api
      * Operation updateShipmentStatusWithHttpInfo
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload Request to update the shipment status. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload The request body for the updateShipmentStatus operation. (required)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -3110,7 +4259,7 @@ class OrdersV0Api
      * 
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload Request to update the shipment status. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload The request body for the updateShipmentStatus operation. (required)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -3126,7 +4275,7 @@ class OrdersV0Api
      * 
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload Request to update the shipment status. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload The request body for the updateShipmentStatus operation. (required)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -3173,7 +4322,7 @@ class OrdersV0Api
      * Create request for operation 'updateShipmentStatus'
      *
      * @param  string $order_id An Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload Request to update the shipment status. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateShipmentStatusRequest $payload The request body for the updateShipmentStatus operation. (required)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
@@ -3251,7 +4400,6 @@ class OrdersV0Api
             }
         }
 
-
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
@@ -3276,7 +4424,7 @@ class OrdersV0Api
      * Operation updateVerificationStatus
      *
      * @param  string $order_id An orderId is an Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload Request to update the verification status of an order containing regulated products. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload The request body for the updateVerificationStatus operation. (required)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -3291,7 +4439,7 @@ class OrdersV0Api
      * Operation updateVerificationStatusWithHttpInfo
      *
      * @param  string $order_id An orderId is an Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload Request to update the verification status of an order containing regulated products. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload The request body for the updateVerificationStatus operation. (required)
      *
      * @throws \SellingPartnerApi\ApiException on non-2xx response
      * @throws \InvalidArgumentException
@@ -3421,7 +4569,7 @@ class OrdersV0Api
      * 
      *
      * @param  string $order_id An orderId is an Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload Request to update the verification status of an order containing regulated products. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload The request body for the updateVerificationStatus operation. (required)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -3437,7 +4585,7 @@ class OrdersV0Api
      * 
      *
      * @param  string $order_id An orderId is an Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload Request to update the verification status of an order containing regulated products. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload The request body for the updateVerificationStatus operation. (required)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -3484,7 +4632,7 @@ class OrdersV0Api
      * Create request for operation 'updateVerificationStatus'
      *
      * @param  string $order_id An orderId is an Amazon-defined order identifier, in 3-7-7 format. (required)
-     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload Request to update the verification status of an order containing regulated products. (required)
+     * @param  \SellingPartnerApi\Model\OrdersV0\UpdateVerificationStatusRequest $payload The request body for the updateVerificationStatus operation. (required)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
@@ -3562,7 +4710,6 @@ class OrdersV0Api
             }
         }
 
-
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
@@ -3583,35 +4730,4 @@ class OrdersV0Api
         );
     }
 
-    /**
-     * Create http client option
-     *
-     * @throws \RuntimeException on file opening failure
-     * @return array of http client options
-     */
-    protected function createHttpClientOption()
-    {
-        $options = [];
-        if ($this->config->getDebug()) {
-            $options[RequestOptions::DEBUG] = fopen($this->config->getDebugFile(), 'a');
-            if (!$options[RequestOptions::DEBUG]) {
-                throw new \RuntimeException('Failed to open the debug file: ' . $this->config->getDebugFile());
-            }
-        }
-
-        return $options;
-    }
-
-    /**
-     * Writes to the debug log file
-     *
-     * @param any $data
-     * @return void
-     */
-    private function writeDebug($data)
-    {
-        if ($this->config->getDebug()) {
-            file_put_contents($this->config->getDebugFile(), '[' . date('Y-m-d H:i:s') . ']: ' . print_r($data, true) . "\n", FILE_APPEND);
-        }
-    }
 }

@@ -2,14 +2,19 @@
 
 namespace SellingPartnerApi;
 
-use Aws\Sts\StsClient;
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7;
-use SellingPartnerApi\Api\TokensV20210301Api as TokensApi;
-use SellingPartnerApi\Model\TokensV20210301 as Tokens;
+use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\RequestInterface;
 use RuntimeException;
+use SellingPartnerApi\Api\TokensV20210301Api as TokensApi;
 use SellingPartnerApi\Contract\AuthorizationSignerContract;
 use SellingPartnerApi\Contract\RequestSignerContract;
+use SellingPartnerApi\Model\TokensV20210301 as Tokens;
 
 class Authentication implements RequestSignerContract
 {
@@ -30,7 +35,6 @@ class Authentication implements RequestSignerContract
     private $grantlessAwsCredentials = null;
     private $grantlessCredentialsScope = null;
     private $roleCredentials = null;
-    private $restrictedDataTokens = [];
 
     /**
      * @var string
@@ -86,8 +90,8 @@ class Authentication implements RequestSignerContract
     }
 
     /**
-     * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException|\RuntimeException
+     * @return array
      */
     public function requestLWAToken(): array
     {
@@ -117,8 +121,8 @@ class Authentication implements RequestSignerContract
 
         $body = json_decode($res->getBody(), true);
         $accessToken = $body["access_token"];
-        $expirationDate = new \DateTime("now", new \DateTimeZone("UTC"));
-        $expirationDate->add(new \DateInterval("PT" . strval($body["expires_in"]) . "S"));
+        $expirationDate = new DateTime("now", new DateTimeZone("UTC"));
+        $expirationDate->add(new DateInterval("PT" . strval($body["expires_in"]) . "S"));
         return [$accessToken, $expirationDate->getTimestamp()];
     }
 
@@ -141,14 +145,18 @@ class Authentication implements RequestSignerContract
     /**
      * Signs the given request using Amazon Signature V4.
      *
-     * @param \Guzzle\Psr7\Request $request The request to sign
+     * @param \Psr\Http\Message\RequestInterface $request The request to sign
      * @param ?string $scope If the request is to a grantless operation endpoint, the scope for the grantless token
      * @param ?string $restrictedPath The absolute (generic) path for the endpoint that the request is using if it's an endpoint that requires
      *      a restricted data token
-     * @return \Guzzle\Psr7\Request The signed request
+     * @return \Psr\Http\Message\RequestInterface The signed request
      */
-    public function signRequest(Psr7\Request $request, ?string $scope = null, ?string $restrictedPath = null, ?string $operation = null): Psr7\Request
-    {
+    public function signRequest(
+        RequestInterface $request,
+        ?string $scope = null,
+        ?string $restrictedPath = null,
+        ?string $operation = null
+    ): RequestInterface {
         // This allows us to know if we're signing a grantless operation without passing $scope all over the place
         $this->signingScope = $scope;
 
@@ -162,7 +170,14 @@ class Authentication implements RequestSignerContract
             $dataElements = explode(',', $params['dataElements']);
         }
 
-        if (!$this->signingScope && ($restrictedPath === null || $dataElements === [])) {
+        $hasDataElements = ['getOrders', 'getOrder', 'getOrderItems'];
+        if (
+            !$this->signingScope && (
+                // This makes it possible to call restricted operations that take dataElements *without*
+                // generating an RDT as long as no dataElements are passed.
+                $restrictedPath === null || ($dataElements === [] && in_array($operation, $hasDataElements, true))
+            )
+        ) {
             $relevantCreds = $this->getAwsCredentials();
         } else if ($this->signingScope) {  // There is no overlap between grantless and restricted operations
             $relevantCreds = $this->getGrantlessAwsCredentials($scope);
@@ -189,14 +204,18 @@ class Authentication implements RequestSignerContract
                 $request = $request->withUri($newUri);
             }
 
-            if ($needRdt) {
-                $relevantCreds = $this->getRestrictedDataToken($restrictedPath, $request->getMethod(), true, $dataElements);
+            // Sandbox requests don't require RDTs
+            if ($needRdt && !Endpoint::isSandbox($request->getUri()->getHost())) {
+                $relevantCreds = $this->getRestrictedDataToken($restrictedPath, $request->getMethod(), $dataElements);
             }
         }
 
         $accessToken = $relevantCreds->getSecurityToken();
+        $isStsRequest = stripos($request->getUri()->getHost(), 'sts.') !== false;
 
-        if ($this->roleArn !== null) {
+        // Don't try to get role credentials if we're using this method to sign an STS request, because
+        // that will cause an infinite loop
+        if ($this->roleArn !== null && !$isStsRequest) {
             $relevantCreds = $this->getRoleCredentials();
         }
 
@@ -204,12 +223,11 @@ class Authentication implements RequestSignerContract
         $signedRequest = $this->authorizationSigner->sign($request, $relevantCreds)
             ->withHeader('x-amz-access-token', $accessToken);
 
-        if ($this->roleArn) {
+        if ($this->roleArn && !$isStsRequest) {
             $signedRequest = $signedRequest->withHeader("x-amz-security-token", $relevantCreds->getSecurityToken());
         }
 
         $this->signingScope = null;
-
         return $signedRequest;
     }
 
@@ -247,28 +265,31 @@ class Authentication implements RequestSignerContract
      */
     public function getRoleCredentials(): Credentials
     {
-        $originalCreds = $this->signingScope ? $this->getGrantlessAwsCredentials() : $this->getAwsCredentials();
         if ($this->needNewCredentials($this->roleCredentials)) {
-            $client = new StsClient([
-                'sts_regional_endpoints' => 'regional',
-                'region' => $this->endpoint['region'],
-                'version' => '2011-06-15',
-                'credentials' => [
-                    'key' => $originalCreds->getAccessKeyId(),
-                    'secret' => $originalCreds->getSecretKey(),
-                ],
-            ]);
             $assumeTime = time();
-            $assumed = $client->AssumeRole([
+            $client = new Client();
+            $query = Psr7\Query::build([
+                'Action' => 'AssumeRole',
                 'RoleArn' => $this->roleArn,
                 'RoleSessionName' => "spapi-assumerole-{$assumeTime}",
+                'Version' => '2011-06-15',
             ]);
-            $credentials = $assumed['Credentials'];
+            $request = new Request(
+                'POST',
+                "https://sts.{$this->endpoint['region']}.amazonaws.com?{$query}",
+                ['Accept' => 'application/json']
+            );
+            $signedRequest = $this->signRequest($request);
+
+            $assumed = $client->send($signedRequest);
+            $assumedJson = json_decode($assumed->getBody(), true);
+            $credentials = $assumedJson['AssumeRoleResponse']['AssumeRoleResult']['Credentials'];
+
             $this->roleCredentials = new Credentials(
                 $credentials['AccessKeyId'],
                 $credentials['SecretAccessKey'],
                 $credentials['SessionToken'],
-                $credentials['Expiration']->getTimestamp()
+                $credentials['Expiration'],
             );
         }
 
@@ -280,72 +301,49 @@ class Authentication implements RequestSignerContract
      *
      * @param string $path The generic or specific path for the restricted operation
      * @param string $method The HTTP method of the restricted operation
-     * @param ?bool $generic Whether or not $path is a generic URL or a specific one. Default true
      * @param ?array $dataElements The restricted data elements to request access to, if any.
      *      Only applies to getOrder, getOrders, and getOrderItems. Default empty array.
      * @return \SellingPartnerApi\Credentials A Credentials object holding the RDT
      */
-    public function getRestrictedDataToken(string $path, string $method, ?bool $generic = true, ?array $dataElements = []): Credentials
+    public function getRestrictedDataToken(string $path, string $method, ?array $dataElements = []): Credentials
     {
-        // Grab any pre-existing RDT for this operation
-        $existingCreds = null;
-        if (
-            $generic &&  // Don't try to find a pre-existing token for a non-generic restricted path
-            isset($this->restrictedDataTokens[$path]) &&
-            strtoupper($this->restrictedDataTokens[$path]['method']) === strtoupper($method)
-        ) {
-            $existingCreds = $this->restrictedDataTokens[$path]['credentials'];
+        $standardCredentials = $this->getAwsCredentials();
+        $tokensApi = $this->tokensApi;
+        if (is_null($tokensApi)) {
+            $config = new Configuration([
+                "lwaClientId" => $this->lwaClientId,
+                "lwaClientSecret" => $this->lwaClientSecret,
+                "lwaRefreshToken" => $this->lwaRefreshToken,
+                "lwaAuthUrl" => $this->lwaAuthUrl,
+                "awsAccessKeyId" => $this->awsAccessKeyId,
+                "awsSecretAccessKey" => $this->awsSecretAccessKey,
+                "accessToken" => $standardCredentials->getSecurityToken(),
+                "accessTokenExpiration" => $standardCredentials->getExpiration(),
+                "roleArn" => $this->roleArn,
+                "endpoint" => $this->endpoint,
+            ]);
+            $tokensApi = new TokensApi($config);
         }
 
-        $rdtCreds = $existingCreds;
-        // Create a new RDT if no matching one exists or if the matching one is expired
-        if ($this->needNewCredentials($existingCreds)) {
-            $standardCredentials = $this->getAwsCredentials();
-            $tokensApi = $this->tokensApi;
-            if (is_null($tokensApi)) {
-                $config = new Configuration([
-                    "lwaClientId" => $this->lwaClientId,
-                    "lwaClientSecret" => $this->lwaClientSecret,
-                    "lwaRefreshToken" => $this->lwaRefreshToken,
-                    "lwaAuthUrl" => $this->lwaAuthUrl,
-                    "awsAccessKeyId" => $this->awsAccessKeyId,
-                    "awsSecretAccessKey" => $this->awsSecretAccessKey,
-                    "accessToken" => $standardCredentials->getSecurityToken(),
-                    "accessTokenExpiration" => $standardCredentials->getExpiration(),
-                    "roleArn" => $this->roleArn,
-                    "endpoint" => $this->endpoint,
-                ]);
-                $tokensApi = new TokensApi($config);
-            }
-
-            $restrictedResource = new Tokens\RestrictedResource([
-                "method" => $method,
-                "path" => $path,
-            ]);
-            if ($dataElements !== []) {
-                $restrictedResource->setDataElements($dataElements);
-            }
-
-            $body = new Tokens\CreateRestrictedDataTokenRequest([
-                "restricted_resources" => [$restrictedResource],
-            ]);
-            $rdtData = $tokensApi->createRestrictedDataToken($body);
-
-            $rdtCreds = new Credentials(
-                $this->awsAccessKeyId,
-                $this->awsSecretAccessKey,
-                $rdtData->getRestrictedDataToken(),
-                time() + intval($rdtData->getExpiresIn())
-            );
-
-            // Save new RDT, if it's generic
-            if ($generic) {
-                $this->restrictedDataTokens[$path] = [
-                    "method" => $method,
-                    "credentials" => $rdtCreds,
-                ];
-            }
+        $restrictedResource = new Tokens\RestrictedResource([
+            "method" => $method,
+            "path" => $path,
+        ]);
+        if ($dataElements !== []) {
+            $restrictedResource->setDataElements($dataElements);
         }
+
+        $body = new Tokens\CreateRestrictedDataTokenRequest([
+            "restricted_resources" => [$restrictedResource],
+        ]);
+        $rdtData = $tokensApi->createRestrictedDataToken($body);
+
+        $rdtCreds = new Credentials(
+            $this->awsAccessKeyId,
+            $this->awsSecretAccessKey,
+            $rdtData->getRestrictedDataToken(),
+            time() + intval($rdtData->getExpiresIn())
+        );
 
         return $rdtCreds;
     }
@@ -469,8 +467,8 @@ class Authentication implements RequestSignerContract
      * Set SP API endpoint. $endpoint should be one of the constants from Endpoint.php.
      * 
      * @param array $endpoint
-     * @return void
      * @throws RuntimeException
+     * @return void
      */
     public function setEndpoint(array $endpoint): void
     {
@@ -507,6 +505,6 @@ class Authentication implements RequestSignerContract
      */
     public function formattedRequestTime(?bool $withTime = true): ?string
     {
-        return $this->requestSigner->formattedRequestTime($withTime);
+        return $this->authorizationSigner->formattedRequestTime($withTime);
     }
 }
