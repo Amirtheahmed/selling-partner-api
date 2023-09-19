@@ -29,7 +29,6 @@ namespace SellingPartnerApi\Model\FbaInboundV0;
 use ArrayAccess;
 use SellingPartnerApi\Model\BaseModel;
 use SellingPartnerApi\Model\ModelInterface;
-use SellingPartnerApi\ObjectSerializer;
 
 /**
  * Address Class Doc Comment
@@ -190,10 +189,6 @@ class Address extends BaseModel implements ModelInterface, ArrayAccess, \JsonSer
             $invalidProperties[] = "invalid value for 'address_line2', the character length must be smaller than or equal to 60.";
         }
 
-        if (!is_null($this->container['district_or_county']) && (mb_strlen($this->container['district_or_county']) > 25)) {
-            $invalidProperties[] = "invalid value for 'district_or_county', the character length must be smaller than or equal to 25.";
-        }
-
         if ($this->container['city'] === null) {
             $invalidProperties[] = "'city' can't be null";
         }
@@ -318,10 +313,6 @@ class Address extends BaseModel implements ModelInterface, ArrayAccess, \JsonSer
      */
     public function setDistrictOrCounty($district_or_county)
     {
-        if (!is_null($district_or_county) && (mb_strlen($district_or_county) > 25)) {
-            throw new \InvalidArgumentException('invalid length for $district_or_county when calling Address., must be smaller than or equal to 25.');
-        }
-
         $this->container['district_or_county'] = $district_or_county;
 
         return $this;

@@ -29,7 +29,6 @@ namespace SellingPartnerApi\Model\FbaInboundV0;
 use ArrayAccess;
 
 use SellingPartnerApi\Model\ModelInterface;
-use SellingPartnerApi\ObjectSerializer;
 
 /**
  * CurrencyCode Class Doc Comment
@@ -51,6 +50,7 @@ class CurrencyCode
     const GBP = 'GBP';
     const EUR = 'EUR';
     const PLN = 'PLN';
+    const JPY = 'JPY';
     
     /**
      * Gets allowable values of the enum
@@ -64,6 +64,7 @@ class CurrencyCode
             self::GBP,
             self::EUR,
             self::PLN,
+            self::JPY,
         ];
         // This is necessary because Amazon does not consistently capitalize their
         // enum values, so we do case-insensitive enum value validation in ObjectSerializer

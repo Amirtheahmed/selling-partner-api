@@ -29,7 +29,6 @@ namespace SellingPartnerApi\Model\VendorDirectFulfillmentPaymentsV1;
 use ArrayAccess;
 use SellingPartnerApi\Model\BaseModel;
 use SellingPartnerApi\Model\ModelInterface;
-use SellingPartnerApi\ObjectSerializer;
 
 /**
  * TaxRegistrationDetail Class Doc Comment
@@ -236,7 +235,7 @@ class TaxRegistrationDetail extends BaseModel implements ModelInterface, ArrayAc
     /**
      * Sets tax_registration_number
      *
-     * @param string $tax_registration_number Tax registration number for the party. For example, VAT ID.
+     * @param string $tax_registration_number Tax registration number for the entity. For example, VAT ID, Consumption Tax ID.
      *
      * @return self
      */

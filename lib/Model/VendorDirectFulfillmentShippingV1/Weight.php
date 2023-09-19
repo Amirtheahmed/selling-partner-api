@@ -29,13 +29,12 @@ namespace SellingPartnerApi\Model\VendorDirectFulfillmentShippingV1;
 use ArrayAccess;
 use SellingPartnerApi\Model\BaseModel;
 use SellingPartnerApi\Model\ModelInterface;
-use SellingPartnerApi\ObjectSerializer;
 
 /**
  * Weight Class Doc Comment
  *
  * @category Class
- * @description The weight.
+ * @description The weight. This object is mandatory when using the [`submitShipmentConfirmations`](https://developer-docs.amazon.com/sp-api/docs/vendor-direct-fulfillment-shipping-api-v1-reference#submitshipmentconfirmations) operation.
  * @package  SellingPartnerApi
  * @group 
  * @implements \ArrayAccess<TKey, TValue>

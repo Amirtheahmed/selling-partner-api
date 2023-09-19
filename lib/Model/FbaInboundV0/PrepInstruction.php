@@ -29,7 +29,6 @@ namespace SellingPartnerApi\Model\FbaInboundV0;
 use ArrayAccess;
 
 use SellingPartnerApi\Model\ModelInterface;
-use SellingPartnerApi\ObjectSerializer;
 
 /**
  * PrepInstruction Class Doc Comment
@@ -61,6 +60,7 @@ class PrepInstruction
     const SET_STICKERING = 'SetStickering';
     const BLANK_STICKERING = 'BlankStickering';
     const NO_PREP = 'NoPrep';
+    const NONE = 'None';
     
     /**
      * Gets allowable values of the enum
@@ -84,6 +84,7 @@ class PrepInstruction
             self::SET_STICKERING,
             self::BLANK_STICKERING,
             self::NO_PREP,
+            self::NONE,
         ];
         // This is necessary because Amazon does not consistently capitalize their
         // enum values, so we do case-insensitive enum value validation in ObjectSerializer
